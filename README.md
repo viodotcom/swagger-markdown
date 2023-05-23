@@ -6,3 +6,9 @@ Converts a swagger or OpenAPI file to MarkDown
 ```bash
 swagger-markdown -i <inputFile> -o <outputFile>
 ```
+
+### Example
+
+```bash
+swagger-markdown -i ./testdoc/sapi-backend.yaml -o ./testdoc/sapi-backend.md
+```

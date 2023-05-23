@@ -21,6 +21,12 @@ func main() {
 		return
 	}
 
+	// check if the input file exists
+	if _, err := os.Stat(*input); os.IsNotExist(err) {
+		fmt.Printf("Input file not found: %s\n", *input)
+		return
+	}
+
 	// read the swagger file
 	swaggerData, err := os.ReadFile(*input)
 	if err != nil {
@@ -193,62 +199,91 @@ func objectMD(schemaMap map[string]interface{}) string {
 	sb := strings.Builder{}
 
 	properties, ok := schemaMap["properties"]
-	if ok {
-		propertiesMap, ok := properties.(map[string]interface{})
-		if !ok {
-			return ""
+	if !ok {
+		return ""
+	}
+
+	propertiesMap, ok := properties.(map[string]interface{})
+	if !ok {
+		return ""
+	}
+	sb.WriteString("**Type:** object\n\n")
+	sb.WriteString("**Properties:**\n\n")
+	sb.WriteString("| Name | Type | Description | Example |\n")
+	sb.WriteString("| --- | --- | --- | --- |\n")
+	enumInformations := make(map[string][]string, 0)
+	for propertyName, property := range propertiesMap {
+		propertyMap := property.(map[string]interface{})
+		typ, ok := propertyMap["type"]
+		var typeText string
+		if ok {
+			typeText, _ = typ.(string)
 		}
-		sb.WriteString("**Type:** object\n\n")
-		sb.WriteString("**Properties:**\n\n")
-		sb.WriteString("| Name | Type | Description | Example |\n")
-		sb.WriteString("| --- | --- | --- | --- |\n")
-		for propertyName, property := range propertiesMap {
-			propertyMap := property.(map[string]interface{})
-			typ, ok := propertyMap["type"]
-			var typeText string
-			if ok {
-				typeText, _ = typ.(string)
-			}
 
-			ref, ok := propertyMap["$ref"]
-			var refText string
-			if ok {
-				refText, _ = ref.(string)
-			}
+		ref, ok := propertyMap["$ref"]
+		var refText string
+		if ok {
+			refText, _ = ref.(string)
+		}
 
-			description, ok := propertyMap["description"]
-			var descriptionText string
-			if ok {
-				descriptionText, _ = description.(string)
-			}
+		description, ok := propertyMap["description"]
+		var descriptionText string
+		if ok {
+			descriptionText, _ = description.(string)
+		}
 
-			example, ok := propertyMap["example"]
-			var exampleText string
-			if ok {
-				exampleText, _ = example.(string)
-			}
+		example, ok := propertyMap["example"]
+		var exampleText string
+		if ok {
+			exampleText, _ = example.(string)
+		}
 
-			if refText != "" {
-				typeText = "[" + strings.ReplaceAll(refText, "#/definitions/", "") + "]" + "(" + refText + ")"
-			} else if typeText == "array" {
-				items, ok := propertyMap["items"]
+		enums, ok := propertyMap["enum"]
+		var enumsTexts []string
+		if ok {
+			enumsArray, ok := enums.([]interface{})
+			if ok {
+				for _, enum := range enumsArray {
+					enumsTexts = append(enumsTexts, enum.(string))
+				}
+				enumInformations[propertyName] = enumsTexts
+			}
+		}
+
+		if refText != "" {
+			typeText = "[" + strings.ReplaceAll(refText, "#/definitions/", "") + "]" + "(" + refText + ")"
+		} else if typeText == "array" {
+			items, ok := propertyMap["items"]
+			if ok {
+				itemsMap := items.(map[string]interface{})
+				ref, ok := itemsMap["$ref"]
 				if ok {
-					itemsMap := items.(map[string]interface{})
-					ref, ok := itemsMap["$ref"]
+					refText, _ = ref.(string)
+					typeText = "[][" + strings.ReplaceAll(refText, "#/definitions/", "") + "]" + "(" + refText + ")"
+				} else {
+					typ, ok := itemsMap["type"]
 					if ok {
-						refText, _ = ref.(string)
-						typeText = "[][" + strings.ReplaceAll(refText, "#/definitions/", "") + "]" + "(" + refText + ")"
-					} else {
-						typ, ok := itemsMap["type"]
-						if ok {
-							arrayTypeText, _ := typ.(string)
-							typeText = "[]" + arrayTypeText
-						}
+						arrayTypeText, _ := typ.(string)
+						typeText = "[]" + arrayTypeText
 					}
 				}
 			}
+		}
+		if len(enumsTexts) > 0 {
+			typeText = typeText + " ([enums](#/enums/" + propertyName + "))"
+		}
 
-			sb.WriteString("| " + propertyName + " | " + typeText + " | " + oneleline(descriptionText) + " | " + exampleText + " |\n")
+		sb.WriteString("| " + propertyName + " | " + typeText + " | " + oneleline(descriptionText) + " | " + exampleText + " |\n")
+	}
+
+	if len(enumInformations) > 0 {
+		sb.WriteString("\n\n")
+		sb.WriteString("## Enums\n\n")
+		for enumName, enumValues := range enumInformations {
+			sb.WriteString("**<span id=\"/enums/" + enumName + "\"></span>" + enumName + ":**\n\n")
+			sb.WriteString("| " + enumName + " |\n")
+			sb.WriteString("| --- |\n")
+			sb.WriteString("|" + strings.Join(enumValues, ", ") + "|\n\n")
 		}
 	}
 
