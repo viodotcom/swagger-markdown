@@ -132,6 +132,7 @@ func generateMarkdown(swagger *openapi3.T) string {
 						linkToASchema = ref.(string)
 					}
 				}
+				linkToASchema = strings.ReplaceAll(linkToASchema, "#/definitions/", "")
 				sb.WriteString("| " + statusCode + " | [" + description + "](" + linkToASchema + ") |\n")
 			}
 			sb.WriteString("\n\n---\n\n") // Add a separator between each method
@@ -260,7 +261,8 @@ func objectMD(schemaMap map[string]interface{}) string {
 				ref, ok := itemsMap["$ref"]
 				if ok {
 					refText, _ = ref.(string)
-					typeText = "[][" + strings.ReplaceAll(refText, "#/definitions/", "") + "]" + "(" + refText + ")"
+					reflink := strings.ReplaceAll(refText, "#/definitions/", "")
+					typeText = "[][" + reflink + "]" + "(" + reflink + ")"
 				} else {
 					typ, ok := itemsMap["type"]
 					if ok {
@@ -307,7 +309,7 @@ func mapMD(schemaMap map[string]interface{}) string {
 		mapValueText, ok := mapValue.(string)
 		if ok {
 			mapValueTextObjectName := strings.ReplaceAll(mapValueText, "#/definitions/", "")
-			sb.WriteString("[" + mapValueTextObjectName + "](" + mapValueText + ")\n\n")
+			sb.WriteString("[" + mapValueTextObjectName + "](" + mapValueTextObjectName + ")\n\n")
 		}
 	} else if additionalPropertiesMap["type"] == "array" {
 		sb.WriteString(arrayMarkDown(additionalPropertiesMap) + "\n\n")
@@ -334,7 +336,7 @@ func arrayMarkDown(schemaMap map[string]interface{}) string {
 				refText, ok := ref.(string)
 				if ok {
 					refTextObjectName := strings.ReplaceAll(refText, "#/definitions/", "")
-					sb.WriteString("[" + refTextObjectName + "](" + refText + ")\n\n")
+					sb.WriteString("[" + refTextObjectName + "](" + refTextObjectName + ")\n\n")
 				}
 			} else {
 				itemsMapItems, ok := itemsMap["items"]
