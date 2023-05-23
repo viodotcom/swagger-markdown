@@ -142,7 +142,7 @@ func generateMarkdown(swagger *openapi3.T) string {
 	definitions, ok := swagger.Extensions["definitions"]
 	if ok {
 		for name, schema := range definitions.(map[string]interface{}) {
-			sb.WriteString("### <span id=\"/definitions/" + name + "\"></span>" + name + "\n\n")
+			sb.WriteString("### <span id=\"" + name + "\"></span>" + name + "\n\n")
 			schemaMap := schema.(map[string]interface{})
 			title, ok := schemaMap["title"].(string)
 			if ok {
@@ -251,7 +251,8 @@ func objectMD(schemaMap map[string]interface{}) string {
 		}
 
 		if refText != "" {
-			typeText = "[" + strings.ReplaceAll(refText, "#/definitions/", "") + "]" + "(" + refText + ")"
+			reflink := strings.ReplaceAll(refText, "#/definitions/", "")
+			typeText = "[" + reflink + "]" + "(" + reflink + ")"
 		} else if typeText == "array" {
 			items, ok := propertyMap["items"]
 			if ok {
