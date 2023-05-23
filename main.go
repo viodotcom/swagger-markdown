@@ -252,7 +252,7 @@ func objectMD(schemaMap map[string]interface{}) string {
 		}
 
 		if refText != "" {
-			reflink := strings.ReplaceAll(refText, "#/definitions/", "")
+			reflink := strings.ReplaceAll(refText, "#/definitions/", "#")
 			typeText = "[" + reflink + "]" + "(" + reflink + ")"
 		} else if typeText == "array" {
 			items, ok := propertyMap["items"]
@@ -261,7 +261,7 @@ func objectMD(schemaMap map[string]interface{}) string {
 				ref, ok := itemsMap["$ref"]
 				if ok {
 					refText, _ = ref.(string)
-					reflink := strings.ReplaceAll(refText, "#/definitions/", "")
+					reflink := strings.ReplaceAll(refText, "#/definitions/", "#")
 					typeText = "[][" + reflink + "]" + "(" + reflink + ")"
 				} else {
 					typ, ok := itemsMap["type"]
@@ -308,7 +308,7 @@ func mapMD(schemaMap map[string]interface{}) string {
 	if ok {
 		mapValueText, ok := mapValue.(string)
 		if ok {
-			mapValueTextObjectName := strings.ReplaceAll(mapValueText, "#/definitions/", "")
+			mapValueTextObjectName := strings.ReplaceAll(mapValueText, "#/definitions/", "#")
 			sb.WriteString("[" + mapValueTextObjectName + "](" + mapValueTextObjectName + ")\n\n")
 		}
 	} else if additionalPropertiesMap["type"] == "array" {
@@ -335,7 +335,7 @@ func arrayMarkDown(schemaMap map[string]interface{}) string {
 			if ok {
 				refText, ok := ref.(string)
 				if ok {
-					refTextObjectName := strings.ReplaceAll(refText, "#/definitions/", "")
+					refTextObjectName := strings.ReplaceAll(refText, "#/definitions/", "#")
 					sb.WriteString("[" + refTextObjectName + "](" + refTextObjectName + ")\n\n")
 				}
 			} else {
