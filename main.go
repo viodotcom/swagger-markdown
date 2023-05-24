@@ -145,6 +145,7 @@ func generateMarkdown(swagger *openapi3.T) string {
 	if ok {
 		for name, schema := range definitions.(map[string]interface{}) {
 			sb.WriteString("### <span id=\"/definitions/" + name + "\">" + name + "</span>\n\n")
+			sb.WriteString("<a id=\"/definitions/" + name + "\"></a>\n\n")
 			schemaMap := schema.(map[string]interface{})
 			title, ok := schemaMap["title"].(string)
 			if ok {
