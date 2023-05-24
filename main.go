@@ -78,7 +78,7 @@ func generateMarkdown(swagger *openapi3.T) string {
 
 	for _, path := range paths {
 		pathItem := swagger.Paths[path]
-		sb.WriteString("| [" + path + "](#" + strings.ToLower(path) + ") | ")
+		sb.WriteString("| [" + path + "](#path/" + strings.ToLower(path) + ") | ")
 		for method := range pathItem.Operations() {
 			sb.WriteString(method + " ")
 		}
@@ -90,7 +90,7 @@ func generateMarkdown(swagger *openapi3.T) string {
 	// Generate Markdown for each path
 	for _, path := range paths {
 		pathItem := swagger.Paths[path]
-		sb.WriteString("## <span id=\"" + path + "\">" + path + "</span>\n\n")
+		sb.WriteString("## <span id=path/\"" + path + "\">" + path + "</span>\n\n")
 
 		// Generate Markdown for each HTTP method in the path
 		for method, operation := range pathItem.Operations() {
@@ -124,16 +124,17 @@ func generateMarkdown(swagger *openapi3.T) string {
 				if response.Value.Description != nil {
 					description = oneleline(*response.Value.Description)
 				}
-				linkToASchema := ""
+				linkToSchema := ""
 				ext, ok := response.Value.Extensions["schema"]
 				if ok {
 					ref, ok := ext.(map[string]interface{})["$ref"]
 					if ok {
-						linkToASchema = ref.(string)
+						linkToSchema = ref.(string)
 					}
 				}
-				linkToASchema = strings.ReplaceAll(linkToASchema, "#/definitions/", "")
-				sb.WriteString("| " + statusCode + " | [" + description + "](" + linkToASchema + ") |\n")
+				// replace "#/definitions/" with "#definitions/" to make it work in GitHub
+				linkToSchema = strings.ReplaceAll(linkToSchema, "#/", "#")
+				sb.WriteString("| " + statusCode + " | [" + description + "](" + linkToSchema + ") |\n")
 			}
 			sb.WriteString("\n\n---\n\n") // Add a separator between each method
 		}
@@ -143,15 +144,15 @@ func generateMarkdown(swagger *openapi3.T) string {
 	definitions, ok := swagger.Extensions["definitions"]
 	if ok {
 		for name, schema := range definitions.(map[string]interface{}) {
-			sb.WriteString("### <span id=\"" + name + "\"></span>" + name + "\n\n")
+			sb.WriteString("### <span id=/definitions/\"" + name + "\"></span>" + name + "\n\n")
 			schemaMap := schema.(map[string]interface{})
 			title, ok := schemaMap["title"].(string)
 			if ok {
-				sb.WriteString(oneleline(title) + "\n\n")
+				sb.WriteString(title + "\n\n")
 			}
 			description, ok := schemaMap["description"].(string)
 			if ok {
-				sb.WriteString(oneleline(description) + "\n\n")
+				sb.WriteString(description + "\n\n")
 			}
 
 			if schemaMap["type"] == "object" {
@@ -222,9 +223,9 @@ func objectMD(schemaMap map[string]interface{}) string {
 		}
 
 		ref, ok := propertyMap["$ref"]
-		var refText string
+		var refLink string
 		if ok {
-			refText, _ = ref.(string)
+			refLink, _ = ref.(string)
 		}
 
 		description, ok := propertyMap["description"]
@@ -251,18 +252,18 @@ func objectMD(schemaMap map[string]interface{}) string {
 			}
 		}
 
-		if refText != "" {
-			reflink := strings.ReplaceAll(refText, "#/definitions/", "#")
-			typeText = "[" + reflink + "]" + "(" + reflink + ")"
+		if refLink != "" {
+			refText := strings.ReplaceAll(refLink, "#/definitions/", "")
+			typeText = "[" + refText + "]" + "(" + refLink + ")"
 		} else if typeText == "array" {
 			items, ok := propertyMap["items"]
 			if ok {
 				itemsMap := items.(map[string]interface{})
 				ref, ok := itemsMap["$ref"]
 				if ok {
-					refText, _ = ref.(string)
-					reflink := strings.ReplaceAll(refText, "#/definitions/", "#")
-					typeText = "[][" + reflink + "]" + "(" + reflink + ")"
+					refLink, _ = ref.(string)
+					refText := strings.ReplaceAll(refLink, "#/definitions/", "")
+					typeText = "[][" + refText + "]" + "(" + refLink + ")"
 				} else {
 					typ, ok := itemsMap["type"]
 					if ok {
@@ -304,12 +305,12 @@ func mapMD(schemaMap map[string]interface{}) string {
 		return ""
 	}
 	sb.WriteString("**Type:** map[*]->")
-	mapValue, ok := additionalPropertiesMap["$ref"]
+	ref, ok := additionalPropertiesMap["$ref"]
 	if ok {
-		mapValueText, ok := mapValue.(string)
+		refLink, ok := ref.(string)
 		if ok {
-			mapValueTextObjectName := strings.ReplaceAll(mapValueText, "#/definitions/", "#")
-			sb.WriteString("[" + mapValueTextObjectName + "](" + mapValueTextObjectName + ")\n\n")
+			objectName := strings.ReplaceAll(refLink, "#/definitions/", "#")
+			sb.WriteString("[" + objectName + "](" + refLink + ")\n\n")
 		}
 	} else if additionalPropertiesMap["type"] == "array" {
 		sb.WriteString(arrayMarkDown(additionalPropertiesMap) + "\n\n")
@@ -333,10 +334,10 @@ func arrayMarkDown(schemaMap map[string]interface{}) string {
 		if ok {
 			ref, ok := itemsMap["$ref"]
 			if ok {
-				refText, ok := ref.(string)
+				refLink, ok := ref.(string)
 				if ok {
-					refTextObjectName := strings.ReplaceAll(refText, "#/definitions/", "#")
-					sb.WriteString("[" + refTextObjectName + "](" + refTextObjectName + ")\n\n")
+					objectName := strings.ReplaceAll(refLink, "#/definitions/", "")
+					sb.WriteString("[" + objectName + "](" + refLink + ")\n\n")
 				}
 			} else {
 				itemsMapItems, ok := itemsMap["items"]
