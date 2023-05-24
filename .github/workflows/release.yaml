@@ -80,9 +80,6 @@ jobs:
           build_binary windows amd64
           build_binary windows arm64
 
-          nfpm p -p deb -t dist/build
-          nfpm p -p rpm -t dist/build
-
           pushd dist/bin || exit 1
           sha1sum * > sha1sum.txt
           sha256sum * > sha256sum.txt
