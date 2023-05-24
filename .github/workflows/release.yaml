@@ -11,6 +11,8 @@ on:
       - master
 
   pull_request:
+  workflow_dispatch:
+  workflow_call:
 
 permissions:
   contents: write
