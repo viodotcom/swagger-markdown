@@ -133,7 +133,7 @@ func generateMarkdown(swagger *openapi3.T) string {
 					}
 				}
 				// replace "#/definitions/" with "#definitions/" to make it work in GitHub
-				linkToSchema = strings.ReplaceAll(linkToSchema, "#/", "#")
+				//linkToSchema = strings.ReplaceAll(linkToSchema, "#/", "#")
 				sb.WriteString("| " + statusCode + " | [" + description + "](" + linkToSchema + ") |\n")
 			}
 			sb.WriteString("\n\n---\n\n") // Add a separator between each method
