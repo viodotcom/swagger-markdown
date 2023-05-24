@@ -240,7 +240,15 @@ func objectMD(schemaMap map[string]interface{}) string {
 	sb.WriteString("| Name | Type | Description | Example |\n")
 	sb.WriteString("| --- | --- | --- | --- |\n")
 	enumInformations := make(map[string][]string, 0)
-	for propertyName, property := range propertiesMap {
+
+	// sort properties by name
+	propertyNames := make([]string, 0, len(propertiesMap))
+	for name := range propertiesMap {
+		propertyNames = append(propertyNames, name)
+	}
+	sort.Strings(propertyNames)
+	for _, propertyName := range propertyNames {
+		property := propertiesMap[propertyName]
 		propertyMap := property.(map[string]interface{})
 		typ, ok := propertyMap["type"]
 		var typeText string
@@ -309,7 +317,15 @@ func objectMD(schemaMap map[string]interface{}) string {
 	if len(enumInformations) > 0 {
 		sb.WriteString("\n\n")
 		sb.WriteString("## Enums\n\n")
-		for enumName, enumValues := range enumInformations {
+
+		// sort enums by name
+		enumNames := make([]string, 0, len(enumInformations))
+		for name := range enumInformations {
+			enumNames = append(enumNames, name)
+		}
+		sort.Strings(enumNames)
+		for _, enumName := range enumNames {
+			enumValues := enumInformations[enumName]
 			sb.WriteString("**<span id=\"/enums/" + enumName + "\"></span>" + enumName + ":**\n\n")
 			sb.WriteString("| " + enumName + " |\n")
 			sb.WriteString("| --- |\n")
