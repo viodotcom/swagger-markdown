@@ -90,7 +90,7 @@ func generateMarkdown(swagger *openapi3.T) string {
 	// Generate Markdown for each path
 	for _, path := range paths {
 		pathItem := swagger.Paths[path]
-		sb.WriteString("## <span id=path\"" + path + "\">" + path + "</span>\n\n")
+		sb.WriteString("## <span id=\"path" + path + "\">" + path + "</span>\n\n")
 
 		// Generate Markdown for each HTTP method in the path
 		for method, operation := range pathItem.Operations() {
