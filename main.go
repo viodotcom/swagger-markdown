@@ -119,7 +119,15 @@ func generateMarkdown(swagger *openapi3.T) string {
 			sb.WriteString("**Responses:**\n\n")
 			sb.WriteString("| Status Code | Description |\n")
 			sb.WriteString("| --- | --- |\n")
-			for statusCode, response := range operation.Responses {
+
+			// sort responses by status code
+			statusCodes := make([]string, 0, len(operation.Responses))
+			for statusCode := range operation.Responses {
+				statusCodes = append(statusCodes, statusCode)
+			}
+			sort.Strings(statusCodes)
+			for _, statusCode := range statusCodes {
+				response := operation.Responses[statusCode]
 				description := ""
 				if response.Value.Description != nil {
 					description = oneleline(*response.Value.Description)
@@ -143,31 +151,48 @@ func generateMarkdown(swagger *openapi3.T) string {
 	sb.WriteString("## Definitions\n\n")
 	definitions, ok := swagger.Extensions["definitions"]
 	if ok {
-		for name, schema := range definitions.(map[string]interface{}) {
-			sb.WriteString("### <span id=\"/definitions/" + name + "\">" + name + "</span>\n\n")
-			sb.WriteString("<a id=\"/definitions/" + name + "\"></a>\n\n")
-			schemaMap := schema.(map[string]interface{})
-			title, ok := schemaMap["title"].(string)
-			if ok {
-				sb.WriteString(title + "\n\n")
-			}
-			description, ok := schemaMap["description"].(string)
-			if ok {
-				sb.WriteString(description + "\n\n")
-			}
-
-			if schemaMap["type"] == "object" {
-				sb.WriteString(objectMarkDown(schemaMap) + "\n\n")
-			} else if schemaMap["type"] == "array" {
-				sb.WriteString(arrayMarkDown(schemaMap) + "\n\n")
-			} else {
-				sb.WriteString("**Type:** " + schemaMap["type"].(string) + "\n\n")
-			}
-
-			sb.WriteString("\n\n---\n\n")
+		definitionsMap, ok := definitions.(map[string]interface{})
+		if ok {
+			sb.WriteString(markDownDefinitions(definitionsMap))
 		}
+
 	}
 
+	return sb.String()
+}
+
+func markDownDefinitions(definitionsMap map[string]interface{}) string {
+	sb := strings.Builder{}
+	// sort definitions by name
+	definitionNames := make([]string, 0, len(definitionsMap))
+	for name := range definitionsMap {
+		definitionNames = append(definitionNames, name)
+	}
+	sort.Strings(definitionNames)
+	for _, name := range definitionNames {
+		schema := definitionsMap[name]
+		sb.WriteString("### <span id=\"/definitions/" + name + "\">" + name + "</span>\n\n")
+		sb.WriteString("<a id=\"/definitions/" + name + "\"></a>\n\n")
+		schemaMap := schema.(map[string]interface{})
+		title, ok := schemaMap["title"].(string)
+		if ok {
+			sb.WriteString(title + "\n\n")
+		}
+		description, ok := schemaMap["description"].(string)
+		if ok {
+			sb.WriteString(description + "\n\n")
+		}
+
+		if schemaMap["type"] == "object" {
+			sb.WriteString(objectMarkDown(schemaMap) + "\n\n")
+		} else if schemaMap["type"] == "array" {
+			sb.WriteString(arrayMarkDown(schemaMap) + "\n\n")
+		} else {
+			sb.WriteString("**Type:** " + schemaMap["type"].(string) + "\n\n")
+		}
+
+		sb.WriteString("\n\n---\n\n")
+	}
 	return sb.String()
 }
 
