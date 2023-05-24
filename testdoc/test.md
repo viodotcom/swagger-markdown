@@ -405,46 +405,46 @@ anchor endpoint.
 
 | Name | Type | Description | Example |
 | --- | --- | --- | --- |
+| Attributes | []string | Comma-separated attributes to retrieve | hotelEntities |
 | BoundingBox | string | topLeft and bottomRight coordinates of bounding box to perform search inside it.  The format is `LatTopLeft,LonTopLeft,LatBottomRight,LonBottomRight`  The types are all float64 numbers. | 46.650828100116044,7.123046875,45.17210966999772,1.009765625 |
 | Currency | string | 3-char ISO currency uppercase | EUR |
-| Query | string | Free-text query | Amsterdam city |
-| anonymousId | string | Unique ID identifying users |  |
-| preferredRate | number | Offer’s price user saw on a CA (meta) platform |  |
-| searchId | string | A correlation id used in Analytics to identify different searches. Sapi SDK generates a new unique value per each new user search and passes it to Sapi Backend to both /search and /offers endpoints, the same value. Value is changed when a new search initiated, check documentation for Sapi SDK for details what is considered a new search.  Sapi Backend passes it to RAA when retrieving offers.  If not provided, generated as UUID. nolint:lll |  |
-| Attributes | []string | Comma-separated attributes to retrieve | hotelEntities |
+| HotelID | string | Hotel ID for hotel search. If present, takes precedence over placeId, query and geolocation. | 1371626 |
+| Language | string ([enums](#/enums/Language)) | Language code of a visitor | en |
+| PlaceID | string | Place ID for place search. If present, takes precedence over query and geolocation. | 47319 |
 | ProfileID | string | Profile is a set of configurations for a SAPI client |  |
-| deviceType | string ([enums](#/enums/deviceType)) | The type of the requestor's device. If it isn't specified then the server determines it from User-Agent request header. If the server couldn't determine it, then value is set to desktop. | desktop |
-| nights | integer | Number of nights of stay |  |
+| Query | string | Free-text query | Amsterdam city |
+| Variations | string | Comma-separated list of AB-testing variations to apply | pp000004-tags2-b,v8th43ad-saf-search-a |
+| anonymousId | string | Unique ID identifying users |  |
+| brand | string ([enums](#/enums/brand)) | Brand of an application that uses Sapi. Required to do RAA profile selection | findhotel |
 | checkIn | string | Check in date (YYYY-MM-DD) | 2021-10-10 |
 | checkOut | string | Check out date (YYYY-MM-DD) | 2021-10-11 |
-| lat | number | Latitude in degrees |  |
-| brand | string ([enums](#/enums/brand)) | Brand of an application that uses Sapi. Required to do RAA profile selection | findhotel |
+| countryCode | string | The 2-char ISO 3166 country code of a requestor. If not specified then the server determines it from the client's IP address. |  |
 | cugDeals | []string ([enums](#/enums/cugDeals)) | Codes of closed user group deals to retrieve offers | signed_in,offline |
-| Language | string ([enums](#/enums/Language)) | Language code of a visitor | en |
+| dayDistance | integer | Amount of full days from now to desired check in date (works in combination with nights parameter). |  |
+| deviceType | string ([enums](#/enums/deviceType)) | The type of the requestor's device. If it isn't specified then the server determines it from User-Agent request header. If the server couldn't determine it, then value is set to desktop. | desktop |
+| emailDomain | string | User email domain is for authenticated user as a value, if email is available. |  |
+| label | string | Opaque value that will be passed to RAA for tracking purposes. |  |
+| lat | number | Latitude in degrees |  |
 | lon | number | Longitude in degrees |  |
+| nights | integer | Number of nights of stay |  |
 | originId | string ([enums](#/enums/originId)) | Identifier of origin where the request was originated | c3po6twr70 |
 | precision | [PrecisionRanges](#/definitions/PrecisionRanges) |  |  |
-| Variations | string | Comma-separated list of AB-testing variations to apply | pp000004-tags2-b,v8th43ad-saf-search-a |
-| label | string | Opaque value that will be passed to RAA for tracking purposes. |  |
+| preferredRate | number | Offer’s price user saw on a CA (meta) platform |  |
+| rooms | string | Rooms configuration | 2 |
+| screenshots | integer | Screenshots is the number of screenshots detected by the client |  |
+| searchId | string | A correlation id used in Analytics to identify different searches. Sapi SDK generates a new unique value per each new user search and passes it to Sapi Backend to both /search and /offers endpoints, the same value. Value is changed when a new search initiated, check documentation for Sapi SDK for details what is considered a new search.  Sapi Backend passes it to RAA when retrieving offers.  If not provided, generated as UUID. nolint:lll |  |
+| sortingBoost | string | Indicates to boost the OSO ranking of some offers, based on the criteria in the parameter. For example freeCancellation=true:100 value will multiply the oso score by 100 for offers that have free cancellation. The boost is only supported for freeCancellation at the moment. | freeCancellation=true:100 |
 | tier | string | User's access tier. | member |
 | userId | string | User ID is an authenticated user ID, e.g. the Google ID of a user. It is used for constructing ACL context |  |
-| HotelID | string | Hotel ID for hotel search. If present, takes precedence over placeId, query and geolocation. | 1371626 |
-| countryCode | string | The 2-char ISO 3166 country code of a requestor. If not specified then the server determines it from the client's IP address. |  |
-| rooms | string | Rooms configuration | 2 |
-| PlaceID | string | Place ID for place search. If present, takes precedence over query and geolocation. | 47319 |
-| dayDistance | integer | Amount of full days from now to desired check in date (works in combination with nights parameter). |  |
-| emailDomain | string | User email domain is for authenticated user as a value, if email is available. |  |
-| screenshots | integer | Screenshots is the number of screenshots detected by the client |  |
-| sortingBoost | string | Indicates to boost the OSO ranking of some offers, based on the criteria in the parameter. For example freeCancellation=true:100 value will multiply the oso score by 100 for offers that have free cancellation. The boost is only supported for freeCancellation at the moment. | freeCancellation=true:100 |
 
 
 ## Enums
 
-**<span id="/enums/deviceType"></span>deviceType:**
+**<span id="/enums/Language"></span>Language:**
 
-| deviceType |
+| Language |
 | --- |
-|desktop, mobile, tablet|
+|ar, da, de, en, es, fi, fr, he, hu, id, it, iw, ja, ko, ms, nb, nl, no, nn, pl, pt, pt-BR, ru, sv, th, tr, zh, zh-CN, zh-HK, zh-TW|
 
 **<span id="/enums/brand"></span>brand:**
 
@@ -458,11 +458,11 @@ anchor endpoint.
 | --- |
 |signed_in, offline, sensitive, prime, backup|
 
-**<span id="/enums/Language"></span>Language:**
+**<span id="/enums/deviceType"></span>deviceType:**
 
-| Language |
+| deviceType |
 | --- |
-|ar, da, de, en, es, fi, fr, he, hu, id, it, iw, ja, ko, ms, nb, nl, no, nn, pl, pt, pt-BR, ru, sv, th, tr, zh, zh-CN, zh-HK, zh-TW|
+|desktop, mobile, tablet|
 
 **<span id="/enums/originId"></span>originId:**
 
@@ -488,13 +488,13 @@ AnchorResponse is a response from /anchor handler.
 
 | Name | Type | Description | Example |
 | --- | --- | --- | --- |
+| anchor |  | Anchor object based on the request. - If `HotelID != ""` => it gets Anchor by Hotel (objectID: "hotel:[hotel_object_id]" objectType: "hotel") - Else if `PlaceID != ""` => it gets Anchor by Place (objectID: "place:[place_object_id]" objectType: "place") - Else if `BoundingBox != nil` => it gets Anchor by BoundingBox (objectID: "area:id" objectType: "area") - Else if `Lat != 0` and `Lon != 0` => it gets Anchor by Nearby (objectID: "point:id" objectType: "point") - Else it gets Anchor by the `Query` |  |
+| anchorHotelId | string | If the SearchType is `hotel` and we have a hotel object in our Anchor, it would be the ID of that hotel |  |
+| anchorType | string | AnchorType is either `hotel` or `place` |  |
 | exchangeRates | object | Map of exchange rates for `EUR` and the user specified currency |  |
 | hotelEntities | [HotelEntities](#/definitions/HotelEntities) |  |  |
 | lov | [][Item](#/definitions/Item) |  |  |
 | searchParameters | [AnchorRequest](#/definitions/AnchorRequest) |  |  |
-| anchor |  | Anchor object based on the request. - If `HotelID != ""` => it gets Anchor by Hotel (objectID: "hotel:[hotel_object_id]" objectType: "hotel") - Else if `PlaceID != ""` => it gets Anchor by Place (objectID: "place:[place_object_id]" objectType: "place") - Else if `BoundingBox != nil` => it gets Anchor by BoundingBox (objectID: "area:id" objectType: "area") - Else if `Lat != 0` and `Lon != 0` => it gets Anchor by Nearby (objectID: "point:id" objectType: "point") - Else it gets Anchor by the `Query` |  |
-| anchorHotelId | string | If the SearchType is `hotel` and we have a hotel object in our Anchor, it would be the ID of that hotel |  |
-| anchorType | string | AnchorType is either `hotel` or `place` |  |
 
 
 
@@ -627,10 +627,10 @@ Calendar maps check in date (ISO-formatted as string) to availability entry.
 
 | Name | Type | Description | Example |
 | --- | --- | --- | --- |
-| start | string | The datetime of when this policy starts to be applied. |  |
 | amount | number | The amount of money that is charged in specified currency in case of a cancellation in this policy. |  |
 | currency | string | The currency of which the penalty will be charged if amount is specified. |  |
 | end | string | The datetime of when this policy ends. |  |
+| start | string | The datetime of when this policy starts to be applied. |  |
 
 
 
@@ -665,10 +665,10 @@ Calendar maps check in date (ISO-formatted as string) to availability entry.
 
 | Name | Type | Description | Example |
 | --- | --- | --- | --- |
-| matchedDim | [MatchedDim](#/definitions/MatchedDim) |  |  |
-| matchedOfferPriceDiff | number | In case of match, contains the absolute price diff in the same currency used to return the price. The diff is positive in case of the new price is higher and negative in case of the new price is lower. |  |
 | isClicked | boolean | True if the offer was matched with clicked offer from the search page |  |
 | matchType | string ([enums](#/enums/matchType)) | Type of clicked offer matching. 'exact' means price and all terms are matched. 'by_price' means price and some of terms (but not all) are matched. 'by_terms' means all terms are matched. Terms are freeCancellation, services, room name, payLater, offerType (public or private). |  |
+| matchedDim | [MatchedDim](#/definitions/MatchedDim) |  |  |
+| matchedOfferPriceDiff | number | In case of match, contains the absolute price diff in the same currency used to return the price. The diff is positive in case of the new price is higher and negative in case of the new price is lower. |  |
 
 
 ## Enums
@@ -695,9 +695,9 @@ Calendar maps check in date (ISO-formatted as string) to availability entry.
 
 | Name | Type | Description | Example |
 | --- | --- | --- | --- |
-| name | string | Name of bedroom |  |
 | bed_configurations | [][ContentBedroomsBedConfigurations](#/definitions/ContentBedroomsBedConfigurations) | How beds are configured in the bedroom |  |
 | description | string | Bedroom description |  |
+| name | string | Name of bedroom |  |
 
 
 
@@ -753,9 +753,9 @@ Calendar maps check in date (ISO-formatted as string) to availability entry.
 
 | Name | Type | Description | Example |
 | --- | --- | --- | --- |
+| hero_image | boolean | Whether this is the room hero(main) image |  |
 | id | string | Image ID |  |
 | link | [ContentRoomImageLink](#/definitions/ContentRoomImageLink) |  |  |
-| hero_image | boolean | Whether this is the room hero(main) image |  |
 
 
 
@@ -827,10 +827,10 @@ Calendar maps check in date (ISO-formatted as string) to availability entry.
 
 | Name | Type | Description | Example |
 | --- | --- | --- | --- |
+| area | [ContentRoomRoomInfoArea](#/definitions/ContentRoomRoomInfoArea) |  |  |
 | bedrooms | [][ContentBedrooms](#/definitions/ContentBedrooms) |  |  |
 | count | [ContentRoomRoomInfoCount](#/definitions/ContentRoomRoomInfoCount) |  |  |
 | type | string | Room type |  |
-| area | [ContentRoomRoomInfoArea](#/definitions/ContentRoomRoomInfoArea) |  |  |
 
 
 
@@ -924,17 +924,17 @@ for a given hotel.
 
 ## Enums
 
-**<span id="/enums/source"></span>source:**
-
-| source |
-| --- |
-|Static, Live|
-
 **<span id="/enums/action"></span>action:**
 
 | action |
 | --- |
 |ALLOW, DENY, UNKNOWN|
+
+**<span id="/enums/source"></span>source:**
+
+| source |
+| --- |
+|Static, Live|
 
 
 
@@ -1020,14 +1020,14 @@ for a given hotel.
 
 | Name | Type | Description | Example |
 | --- | --- | --- | --- |
+| cleanliness | number |  |  |
+| dining | number |  |  |
+| facilities | number |  |  |
 | location | number |  |  |
 | overall | number |  |  |
 | pricing | number |  |  |
 | rooms | number |  |  |
 | service | number |  |  |
-| cleanliness | number |  |  |
-| dining | number |  |  |
-| facilities | number |  |  |
 
 
 
@@ -1065,39 +1065,39 @@ for a given hotel.
 
 | Name | Type | Description | Example |
 | --- | --- | --- | --- |
-| parentChainID | string |  |  |
-| propertyTypeId | integer |  |  |
-| tags | [Tags](#/definitions/Tags) |  |  |
 | _geoloc | [LatLon](#/definitions/LatLon) |  |  |
-| address | [TranslatedString](#/definitions/TranslatedString) |  |  |
-| admDivisionLevel3 | string |  |  |
-| guestType | [GuestType](#/definitions/GuestType) |  |  |
-| lastBooked | integer |  |  |
-| admDivisionLevel4 | string |  |  |
-| checkInTime | string |  |  |
-| sentiments | []integer |  |  |
-| starRating | integer |  |  |
-| reviewCount | integer |  |  |
-| themeIds | []integer |  |  |
-| urls | [DatelessProviderLinks](#/definitions/DatelessProviderLinks) |  |  |
-| chainID | string |  |  |
-| country | string |  |  |
-| isDeleted | boolean |  |  |
-| magicRanks | [MagicSortAxes](#/definitions/MagicSortAxes) |  |  |
-| placeADName | [TranslatedArray](#/definitions/TranslatedArray) |  |  |
 | _rankingInfo | [RankingInfo](#/definitions/RankingInfo) |  |  |
+| address | [TranslatedString](#/definitions/TranslatedString) |  |  |
 | admDivisionLevel1 | string |  |  |
-| guestRating | [GuestRating](#/definitions/GuestRating) |  |  |
-| placeDN | [TranslatedArray](#/definitions/TranslatedArray) |  |  |
 | admDivisionLevel2 | string |  |  |
-| cityID | string |  |  |
+| admDivisionLevel3 | string |  |  |
+| admDivisionLevel4 | string |  |  |
+| chainID | string |  |  |
+| checkInTime | string |  |  |
 | checkOutTime | string |  |  |
+| cityID | string |  |  |
+| country | string |  |  |
+| facilities | []integer |  |  |
+| guestRating | [GuestRating](#/definitions/GuestRating) |  |  |
+| guestType | [GuestType](#/definitions/GuestType) |  |  |
 | hotelName | [TranslatedString](#/definitions/TranslatedString) |  |  |
 | imageURIs | []string |  |  |
+| isDeleted | boolean |  |  |
+| lastBooked | integer |  |  |
 | magicRankScore | integer |  |  |
-| pricing | object |  |  |
-| facilities | []integer |  |  |
+| magicRanks | [MagicSortAxes](#/definitions/MagicSortAxes) |  |  |
 | objectID | string |  |  |
+| parentChainID | string |  |  |
+| placeADName | [TranslatedArray](#/definitions/TranslatedArray) |  |  |
+| placeDN | [TranslatedArray](#/definitions/TranslatedArray) |  |  |
+| pricing | object |  |  |
+| propertyTypeId | integer |  |  |
+| reviewCount | integer |  |  |
+| sentiments | []integer |  |  |
+| starRating | integer |  |  |
+| tags | [Tags](#/definitions/Tags) |  |  |
+| themeIds | []integer |  |  |
+| urls | [DatelessProviderLinks](#/definitions/DatelessProviderLinks) |  |  |
 
 
 
@@ -1146,43 +1146,43 @@ HotelEntities is a map of Hotel Entities with tags which are relevant to the req
 
 | Name | Type | Description | Example |
 | --- | --- | --- | --- |
-| checkOutTime | string |  |  |
-| country | string |  |  |
-| propertyTypeId | integer |  |  |
-| urls | [DatelessProviderLinks](#/definitions/DatelessProviderLinks) |  |  |
-| address | [TranslatedString](#/definitions/TranslatedString) |  |  |
-| placeDN | [TranslatedArray](#/definitions/TranslatedArray) |  |  |
-| pricing | object |  |  |
-| sentiments | []integer |  |  |
-| admDivisionLevel2 | string |  |  |
-| cityID | string |  |  |
-| lastBooked | integer |  |  |
-| objectID | string |  |  |
-| regularPriceRange | []integer |  |  |
 | _geoloc | [LatLon](#/definitions/LatLon) |  |  |
-| chainID | string |  |  |
-| hotelName | [TranslatedString](#/definitions/TranslatedString) |  |  |
-| reviewCount | integer |  |  |
-| tags | [Tags](#/definitions/Tags) |  |  |
+| _rankingInfo | [RankingInfo](#/definitions/RankingInfo) |  |  |
+| address | [TranslatedString](#/definitions/TranslatedString) |  |  |
+| admDivisionLevel1 | string |  |  |
+| admDivisionLevel2 | string |  |  |
 | admDivisionLevel3 | string |  |  |
-| checkInTime | string |  |  |
-| facilities | []integer |  |  |
-| imageURIs | []string |  |  |
-| parentChainID | string |  |  |
-| themeIds | []integer |  |  |
 | admDivisionLevel4 | string |  |  |
+| chainID | string |  |  |
+| checkInTime | string |  |  |
+| checkOutTime | string |  |  |
+| cityID | string |  |  |
+| country | string |  |  |
+| displayAddress | string |  |  |
+| facilities | []integer |  |  |
 | guestRating | [GuestRating](#/definitions/GuestRating) |  |  |
+| guestType | [GuestType](#/definitions/GuestType) |  |  |
+| hotelName | [TranslatedString](#/definitions/TranslatedString) |  |  |
+| imageURIs | []string |  |  |
 | indexedDiscountModifier | string |  |  |
 | isDeleted | boolean |  |  |
+| lastBooked | integer |  |  |
 | magicRankScore | integer |  |  |
-| admDivisionLevel1 | string |  |  |
-| displayAddress | string |  |  |
-| starRating | integer |  |  |
-| _rankingInfo | [RankingInfo](#/definitions/RankingInfo) |  |  |
-| guestType | [GuestType](#/definitions/GuestType) |  |  |
 | magicRanks | [MagicSortAxes](#/definitions/MagicSortAxes) |  |  |
+| objectID | string |  |  |
+| parentChainID | string |  |  |
 | placeADName | [TranslatedArray](#/definitions/TranslatedArray) |  |  |
+| placeDN | [TranslatedArray](#/definitions/TranslatedArray) |  |  |
 | placeDisplayName | string |  |  |
+| pricing | object |  |  |
+| propertyTypeId | integer |  |  |
+| regularPriceRange | []integer |  |  |
+| reviewCount | integer |  |  |
+| sentiments | []integer |  |  |
+| starRating | integer |  |  |
+| tags | [Tags](#/definitions/Tags) |  |  |
+| themeIds | []integer |  |  |
+| urls | [DatelessProviderLinks](#/definitions/DatelessProviderLinks) |  |  |
 
 
 
@@ -1199,14 +1199,14 @@ HotelEntities is a map of Hotel Entities with tags which are relevant to the req
 
 | Name | Type | Description | Example |
 | --- | --- | --- | --- |
-| offers | [][Offer](#/definitions/Offer) |  |  |
-| rooms | object |  |  |
 | anchorRate | [Rate](#/definitions/Rate) |  |  |
 | availableOffersCount | integer | Total number of offers available. |  |
 | discount | [Discount](#/definitions/Discount) |  |  |
 | fetchedAllOffers | boolean | complete flag at the the hotel. |  |
 | hasMoreOffers | boolean | HasMoreOffers is true when there are more offers than topOfferLimit available. |  |
 | id | string |  |  |
+| offers | [][Offer](#/definitions/Offer) |  |  |
+| rooms | object |  |  |
 
 
 
@@ -1260,8 +1260,8 @@ HotelEntities is a map of Hotel Entities with tags which are relevant to the req
 
 | Name | Type | Description | Example |
 | --- | --- | --- | --- |
-| lon | number | Longitude in degrees |  |
 | lat | number | Latitude in degrees |  |
+| lon | number | Longitude in degrees |  |
 
 
 
@@ -1278,18 +1278,18 @@ HotelEntities is a map of Hotel Entities with tags which are relevant to the req
 
 | Name | Type | Description | Example |
 | --- | --- | --- | --- |
-| HasFHTOffer | integer | Dense rank by boolean flag whether exists a FHT Offer within top offers. |  |
-| HasPrivateFHTOffer | integer | Dense rank by boolean flag whether exists a private FHT offer within top offers. |  |
-| Rating | integer | Dense rank by guestRating.Overall from high to low. |  |
 | Anchor | integer | Dense rank by similarity of "Who stays here?" - guestType struct where values are least squared difference. (attr1 - attr2)^2. From low to high. |  |
 | Discount | integer | First calculate usual total rate minus cheapest total rate, then calculate dense rank from high to low. |  |
 | Disparity | integer | First calculate the difference between median and minimum total rate of top offers for each hotel. Then calculate dense rank for these values from high to low. |  |
+| Distance | integer | Dense rank by squared distance between current hotel and anchor location (anchor hotell coordinates / place coordinates / boundingBox center), (x1-x2)^2+(y1-y2)^2. For the future consider rounding. From low to high. |  |
 | GeoDistance | integer | Dense rank by _rankingInfo.geoDistance values, from low to high. |  |
 | HSO | integer | Dense rank by _rankingInfo.filters values, from high to low. |  |
-| ReviewCount | integer | Dense rank by review count from high to low. |  |
-| Distance | integer | Dense rank by squared distance between current hotel and anchor location (anchor hotell coordinates / place coordinates / boundingBox center), (x1-x2)^2+(y1-y2)^2. For the future consider rounding. From low to high. |  |
+| HasFHTOffer | integer | Dense rank by boolean flag whether exists a FHT Offer within top offers. |  |
+| HasPrivateFHTOffer | integer | Dense rank by boolean flag whether exists a private FHT offer within top offers. |  |
 | HasPrivateOffer | integer | Dense rank by boolean flag whether exists a private offer within top offers. |  |
 | Location | integer | Dense rank by guestRating.Location from high to low. |  |
+| Rating | integer | Dense rank by guestRating.Overall from high to low. |  |
+| ReviewCount | integer | Dense rank by review count from high to low. |  |
 
 
 
@@ -1306,12 +1306,12 @@ HotelEntities is a map of Hotel Entities with tags which are relevant to the req
 
 | Name | Type | Description | Example |
 | --- | --- | --- | --- |
-| price | boolean | True if total price diff percentage with clicked offer was <= 1% |  |
-| room | boolean | True if matched and clicked offers have the same room name |  |
-| services | boolean | True if matched and clicked offers have the same services |  |
 | freeCancellation | boolean | True if matched and clicked offers both have or don't have free cancellation |  |
 | offerType | boolean | True if matched and clicked offers both are public or private |  |
 | payLater | boolean | True if matched and clicked offers have the same canPayLater value |  |
+| price | boolean | True if total price diff percentage with clicked offer was <= 1% |  |
+| room | boolean | True if matched and clicked offers have the same room name |  |
+| services | boolean | True if matched and clicked offers have the same services |  |
 
 
 
@@ -1369,22 +1369,22 @@ HotelEntities is a map of Hotel Entities with tags which are relevant to the req
 
 | Name | Type | Description | Example |
 | --- | --- | --- | --- |
+| availableRooms | integer | The number of similar rooms the provider still have available. |  |
 | canPayLater | boolean | Shows if the user can be charged later for the offer. |  |
+| cancellationPenalties | [][CancellationPenalty](#/definitions/CancellationPenalty) | The list of penalties applied to the cancellation of the offer. |  |
 | cug | []string | Access tier from Offers data model. Contains the minimum tier the user should be in order to access this offer. |  |
-| matchedOfferPriceDiff | number | In case of match, contains the absolute price diff in the same currency used to return the price. The diff is positive in case of the new price is higher and negative in case of the new price is lower. |  |
 | extraParams |  |  |  |
-| matchedDim | [MatchedDim](#/definitions/MatchedDim) |  |  |
-| links | [][RoomLink](#/definitions/RoomLink) | Array of one item containing a link to book the offer. |  |
 | id | string | Offer ID from Offers data model. |  |
 | isClicked | boolean | True if the offer was matched with clicked offer from the search page |  |
+| links | [][RoomLink](#/definitions/RoomLink) | Array of one item containing a link to book the offer. |  |
 | matchType | string ([enums](#/enums/matchType)) | Type of clicked offer matching. 'exact' means price and all terms are matched. 'by_price' means price and some of terms (but not all) are matched. 'by_terms' means all terms are matched. Terms are freeCancellation, services, room name, payLater, offerType (public or private). |  |
+| matchedDim | [MatchedDim](#/definitions/MatchedDim) |  |  |
+| matchedOfferPriceDiff | number | In case of match, contains the absolute price diff in the same currency used to return the price. The diff is positive in case of the new price is higher and negative in case of the new price is lower. |  |
 | prices | [][RoomPrice](#/definitions/RoomPrice) | Array of prices containing user currency where chargeable are multiplied by number of rooms. |  |
 | providerCode | string | The code of the provider that is selling the offer. |  |
 | providerRateId | string |  |  |
 | providerRateType | string | The rateType in the providers terms. |  |
 | services | array | List of services available for this offer. |  |
-| availableRooms | integer | The number of similar rooms the provider still have available. |  |
-| cancellationPenalties | [][CancellationPenalty](#/definitions/CancellationPenalty) | The list of penalties applied to the cancellation of the offer. |  |
 | tags | []string |  |  |
 
 
@@ -1551,15 +1551,15 @@ OffersMap is offers map data based on each HotelID retrieved from RAA
 
 | Name | Type | Description | Example |
 | --- | --- | --- | --- |
+| filters | integer |  |  |
 | firstMatchedWord | integer |  |  |
 | geoDistance | integer |  |  |
 | geoPrecision | integer |  |  |
-| words | integer |  |  |
-| filters | integer |  |  |
 | nbExactWords | integer |  |  |
 | nbTypos | integer |  |  |
 | proximityDistance | integer |  |  |
 | userScore | integer |  |  |
+| words | integer |  |  |
 
 
 
@@ -1595,17 +1595,17 @@ OffersMap is offers map data based on each HotelID retrieved from RAA
 
 | Name | Type | Description | Example |
 | --- | --- | --- | --- |
-| raaName | string | Room name from RAA. |  |
 | amenities | []string | All amenities available in the room. |  |
-| images | [][Image](#/definitions/Image) | List of rooms images URLs. |  |
-| masterId | string | Identifier for a room after room-level mapping. The room-level mapping operates on a room level and maps together multiple rooms coming from different providers, or from the same provider. |  |
-| occupationPerRoom | integer | Maximum number of people that can stay in the room. |  |
-| smokingOptionsAvailable | boolean |  |  |
-| squashedIds | []string | List of Squashed IDs |  |
 | bedTypes | [][BedType](#/definitions/BedType) | Array of bed types that exist in the room. |  |
 | description | string | Room description. |  |
 | id | string | Identifier which is constructed by hashing of room attributes like provider code, provider hotel id and provider room id. Content's RoomDB is addressable by this identifier, i.e. knowing id it's possible to retrieve the room content. |  |
+| images | [][Image](#/definitions/Image) | List of rooms images URLs. |  |
+| masterId | string | Identifier for a room after room-level mapping. The room-level mapping operates on a room level and maps together multiple rooms coming from different providers, or from the same provider. |  |
 | name | string | Room name in the requested language, if no requested language available, it falls back to English. |  |
+| occupationPerRoom | integer | Maximum number of people that can stay in the room. |  |
+| raaName | string | Room name from RAA. |  |
+| smokingOptionsAvailable | boolean |  |  |
+| squashedIds | []string | List of Squashed IDs |  |
 
 
 
@@ -1622,17 +1622,17 @@ OffersMap is offers map data based on each HotelID retrieved from RAA
 
 | Name | Type | Description | Example |
 | --- | --- | --- | --- |
-| room_info | [ContentRoomRoomInfo](#/definitions/ContentRoomRoomInfo) |  |  |
 | amenities | [][ContentRoomAmenity](#/definitions/ContentRoomAmenity) | Room amenities |  |
+| description | [TranslatedString](#/definitions/TranslatedString) |  |  |
 | fht_id | string | FindHotel Room ID |  |
+| hotel_id | string | Provider hotel id |  |
 | images | [][ContentRoomImage](#/definitions/ContentRoomImage) | Room images |  |
 | master_id | string | MasterRoomId is an identifier for a room after room-level mapping. The room-level mapping operates on a room level and maps together multiple rooms coming from different providers, or from the same provider. |  |
 | name | [TranslatedString](#/definitions/TranslatedString) |  |  |
 | occupancy | [ContentRoomOccupancy](#/definitions/ContentRoomOccupancy) |  |  |
 | provider_code | string | Room Provider Code |  |
+| room_info | [ContentRoomRoomInfo](#/definitions/ContentRoomRoomInfo) |  |  |
 | sanitized_name | [TranslatedString](#/definitions/TranslatedString) |  |  |
-| description | [TranslatedString](#/definitions/TranslatedString) |  |  |
-| hotel_id | string | Provider hotel id |  |
 
 
 
@@ -1649,9 +1649,9 @@ OffersMap is offers map data based on each HotelID retrieved from RAA
 
 | Name | Type | Description | Example |
 | --- | --- | --- | --- |
+| href | string | The URL that the user should be redirected to book this offer. |  |
 | method | string | HTTP method to use with href. |  |
 | type | string | The type of link. |  |
-| href | string | The URL that the user should be redirected to book this offer. |  |
 
 
 
@@ -1668,11 +1668,11 @@ OffersMap is offers map data based on each HotelID retrieved from RAA
 
 | Name | Type | Description | Example |
 | --- | --- | --- | --- |
+| chargeable | [Chargeable](#/definitions/Chargeable) |  |  |
 | currencyCode | string | The currency applied to the rates of the offer, this currency is always the same as requested by the user. |  |
 | hotelFees | [HotelFees](#/definitions/HotelFees) |  |  |
 | rate | [OfferRate](#/definitions/OfferRate) |  |  |
 | type | string | Price type. |  |
-| chargeable | [Chargeable](#/definitions/Chargeable) |  |  |
 
 
 
@@ -1689,19 +1689,19 @@ OffersMap is offers map data based on each HotelID retrieved from RAA
 
 | Name | Type | Description | Example |
 | --- | --- | --- | --- |
-| raaName | string | Room name from RAA. |  |
-| squashedIds | []string | List of Squashed IDs |  |
-| bedTypes | [][BedType](#/definitions/BedType) | Array of bed types that exist in the room. |  |
-| images | [][Image](#/definitions/Image) | List of rooms images URLs. |  |
-| masterId | string | Identifier for a room after room-level mapping. The room-level mapping operates on a room level and maps together multiple rooms coming from different providers, or from the same provider. |  |
-| offers | [Offers](#/definitions/Offers) |  |  |
-| name | string | Room name in the requested language, if no requested language available, it falls back to English. |  |
-| occupationPerRoom | integer | Maximum number of people that can stay in the room. |  |
-| smokingOptionsAvailable | boolean |  |  |
 | amenities | []string | All amenities available in the room. |  |
+| bedTypes | [][BedType](#/definitions/BedType) | Array of bed types that exist in the room. |  |
 | description | string | Room description. |  |
 | hasClickedOffer | boolean | True if the room contains an offer from the search page. |  |
 | id | string | Identifier which is constructed by hashing of room attributes like provider code, provider hotel id and provider room id. Content's RoomDB is addressable by this identifier, i.e. knowing id it's possible to retrieve the room content. |  |
+| images | [][Image](#/definitions/Image) | List of rooms images URLs. |  |
+| masterId | string | Identifier for a room after room-level mapping. The room-level mapping operates on a room level and maps together multiple rooms coming from different providers, or from the same provider. |  |
+| name | string | Room name in the requested language, if no requested language available, it falls back to English. |  |
+| occupationPerRoom | integer | Maximum number of people that can stay in the room. |  |
+| offers | [Offers](#/definitions/Offers) |  |  |
+| raaName | string | Room name from RAA. |  |
+| smokingOptionsAvailable | boolean |  |  |
+| squashedIds | []string | List of Squashed IDs |  |
 
 
 
@@ -1749,10 +1749,10 @@ SearchParams is all parameters needed to send request to RAA for search endpoint
 
 | Name | Type | Description | Example |
 | --- | --- | --- | --- |
-| URL | string | Client settings |  |
 | IsAnchor | boolean |  |  |
 | Profile | string |  |  |
 | Query | [SearchQuery](#/definitions/SearchQuery) |  |  |
+| URL | string | Client settings |  |
 
 
 
@@ -1771,28 +1771,28 @@ SearchQuery is a RAA URL search query parameters.
 
 | Name | Type | Description | Example |
 | --- | --- | --- | --- |
-| Label | string |  |  |
-| RoomLimit | integer |  |  |
-| SearchID | string |  |  |
-| OffersCount | integer |  |  |
-| PreferredRate | number |  |  |
-| SortingBoost | string |  |  |
-| UserAgent | string |  |  |
-| UserIP | string |  |  |
+| AnonymousID | string |  |  |
 | CheckIn | string |  |  |
 | CheckOut | string |  |  |
-| CugDeals | []string |  |  |
-| Destination | []string |  |  |
-| Metadata | string |  |  |
-| Rooms | string |  |  |
-| Tier | string |  |  |
-| TopOffersCount | integer |  |  |
-| AnonymousID | string |  |  |
 | ClientRequestID | string |  |  |
 | CountryCode | string |  |  |
+| CugDeals | []string |  |  |
 | Currency | string |  |  |
+| Destination | []string |  |  |
 | DeviceType | [DeviceType](#/definitions/DeviceType) |  |  |
+| Label | string |  |  |
 | Locale | string |  |  |
+| Metadata | string |  |  |
+| OffersCount | integer |  |  |
+| PreferredRate | number |  |  |
+| RoomLimit | integer |  |  |
+| Rooms | string |  |  |
+| SearchID | string |  |  |
+| SortingBoost | string |  |  |
+| Tier | string |  |  |
+| TopOffersCount | integer |  |  |
+| UserAgent | string |  |  |
+| UserIP | string |  |  |
 
 
 
@@ -1812,62 +1812,56 @@ search endpoint.
 
 | Name | Type | Description | Example |
 | --- | --- | --- | --- |
+| anonymousId | string | Unique ID identifying users |  |
+| attributes | []string | Comma-separated attributes to retrieve | hotelEntities |
 | boundingBox | string | topLeft and bottomRight coordinates of bounding box to perform search inside it.  The format is `LatTopLeft,LonTopLeft,LatBottomRight,LonBottomRight`  The types are all float64 numbers. | 46.650828100116044,7.123046875,45.17210966999772,1.009765625 |
+| brand | string ([enums](#/enums/brand)) | Brand of an application that uses Sapi. Required to do RAA profile selection | findhotel |
 | chainIds | []string | Comma-separated chain ids whose hotels will be promoted in the hotel rankings above the rest hotels |  |
 | checkIn | string | Check in date (YYYY-MM-DD) | 2021-10-10 |
+| checkOut | string | Check out date (YYYY-MM-DD) | 2021-10-11 |
+| clientRequestId | string | UUID identifier of a request that client sends. Correlation id that Sapi passes to RAA for tracking purposes. If not provided, generated as UUID for every new polling, and polling iterations will reuse the same clientRequestId. nolint:lll |  |
+| countryCode | string | The 2-char ISO 3166 country code of a requester. If not specified then the server determines it from the client's IP address. |  |
 | cugDeals | []string ([enums](#/enums/cugDeals)) | Codes of closed user group deals to retrieve offers | signed_in,offline |
-| profileId | string | Profile is a set of configurations for a SAPI client |  |
-| sortingBoost | string | Indicates to boost the OSO ranking of some offers, based on the criteria in the parameter. For example freeCancellation=true:100 value will multiply the oso score by 100 for offers that have free cancellation. The boost is only supported for freeCancellation at the moment. | freeCancellation=true:100 |
-| starRating | []integer | For facet filtering by star rating. | 4,5 |
-| facilities | []integer | Facility ids used for facet filtering |  |
-| hotelId | string | Hotel ID for hotel search. If present, takes precedence over placeId, query and geolocation. | 1371626 |
-| language | string ([enums](#/enums/language)) | Language code of a visitor | en |
-| lon | number | Longitude in degrees |  |
-| noHostels | boolean | If true, then hotels with propertyType=hostel are filtered out |  |
-| query | string | Free-text query | Amsterdam city |
-| brand | string ([enums](#/enums/brand)) | Brand of an application that uses Sapi. Required to do RAA profile selection | findhotel |
+| currency | string | 3-char ISO currency uppercase | EUR |
 | dayDistance | integer | Amount of full days from now to desired check in date (works in combination with nights parameter). |  |
 | deviceType | string ([enums](#/enums/deviceType)) | The type of the requester's device. If it isn't specified then the server determines it from User-Agent request header. If the server couldn't determine it, then value is set to desktop. | desktop |
+| emailDomain | string | User email domain is for authenticated user as a value, if email is available. |  |
+| facilities | []integer | Facility ids used for facet filtering |  |
+| guestRating | integer | Lower bound for filter by guestRating.overall |  |
+| hotelId | string | Hotel ID for hotel search. If present, takes precedence over placeId, query and geolocation. | 1371626 |
 | hotelName | string | Name of the hotel for filter by name.<language> |  |
+| label | string | Opaque value that will be passed to RAA for tracking purposes. |  |
+| language | string ([enums](#/enums/language)) | Language code of a visitor | en |
+| lat | number | Latitude in degrees |  |
+| lon | number | Longitude in degrees |  |
+| nights | integer | Number of nights of stay |  |
+| noHostels | boolean | If true, then hotels with propertyType=hostel are filtered out |  |
+| notPropertyTypeId | []integer | Negative filter by property type | 4,5 |
+| offset | integer | The first offset results will be skipped from the returned results.  Used for pagination. |  |
 | originId | string ([enums](#/enums/originId)) | Identifier of origin where the request was originated | c3po6twr70 |
 | pagesize | integer | Desired page size by the client. Use pagesize=0&hotelId=<id> to return anchor hotel only. Omitted pagesize (default) means the service decides the pagesize. |  |
-| searchId | string | A correlation id used in Analytics to identify different searches. Sapi SDK generates a new unique value per each new user search and passes it to Sapi Backend to both /search and /offers endpoints, the same value. Value is changed when a new search initiated, check documentation for Sapi SDK for details what is considered a new search.  Sapi Backend passes it to RAA when retrieving offers.  If not provided, generated as UUID. nolint:lll |  |
-| attributes | []string | Comma-separated attributes to retrieve | hotelEntities |
-| currency | string | 3-char ISO currency uppercase | EUR |
-| lat | number | Latitude in degrees |  |
-| nights | integer | Number of nights of stay |  |
-| offset | integer | The first offset results will be skipped from the returned results.  Used for pagination. |  |
+| placeId | string | Place ID for place search. If present, takes precedence over query and geolocation. | 47319 |
 | precision | [PrecisionRanges](#/definitions/PrecisionRanges) |  |  |
-| sortField | string ([enums](#/enums/sortField)) | Defines the sort by criteria | popularity |
-| checkOut | string | Check out date (YYYY-MM-DD) | 2021-10-11 |
-| label | string | Opaque value that will be passed to RAA for tracking purposes. |  |
-| notPropertyTypeId | []integer | Negative filter by property type | 4,5 |
+| preferredRate | number | Offer’s price user saw on a CA (meta) platform |  |
+| priceMax | integer | Upper boundary for filter by price |  |
+| priceMin | integer | Lower boundary for filter by price |  |
+| profileId | string | Profile is a set of configurations for a SAPI client |  |
 | propertyTypeId | []integer | Filter by property type Beware that 0 is a valid property type. | 4,5 |
+| query | string | Free-text query | Amsterdam city |
 | rooms | string | Rooms configuration | 2 |
 | screenshots | integer | Screenshots is the number of screenshots detected by the client |  |
-| tier | string | User's access tier. | member |
-| clientRequestId | string | UUID identifier of a request that client sends. Correlation id that Sapi passes to RAA for tracking purposes. If not provided, generated as UUID for every new polling, and polling iterations will reuse the same clientRequestId. nolint:lll |  |
-| emailDomain | string | User email domain is for authenticated user as a value, if email is available. |  |
-| guestRating | integer | Lower bound for filter by guestRating.overall |  |
-| preferredRate | number | Offer’s price user saw on a CA (meta) platform |  |
-| priceMin | integer | Lower boundary for filter by price |  |
-| themeIds | []integer | For facet filtering by theme ids. | 4,5 |
-| userId | string | User ID is an authenticated user ID, e.g. the Google ID of a user. It is used for constructing ACL context. |  |
-| anonymousId | string | Unique ID identifying users |  |
-| countryCode | string | The 2-char ISO 3166 country code of a requester. If not specified then the server determines it from the client's IP address. |  |
+| searchId | string | A correlation id used in Analytics to identify different searches. Sapi SDK generates a new unique value per each new user search and passes it to Sapi Backend to both /search and /offers endpoints, the same value. Value is changed when a new search initiated, check documentation for Sapi SDK for details what is considered a new search.  Sapi Backend passes it to RAA when retrieving offers.  If not provided, generated as UUID. nolint:lll |  |
+| sortField | string ([enums](#/enums/sortField)) | Defines the sort by criteria | popularity |
 | sortOrder | string | Defines the sort order Note: If equals to ascending (default value), then MagicSort is not enabled and defined by the AB-test configuration or sapiOverride, if it equals to the name of configuration magic-sort-axis in AppConfig, then use provided configuration. | ascending |
+| sortingBoost | string | Indicates to boost the OSO ranking of some offers, based on the criteria in the parameter. For example freeCancellation=true:100 value will multiply the oso score by 100 for offers that have free cancellation. The boost is only supported for freeCancellation at the moment. | freeCancellation=true:100 |
+| starRating | []integer | For facet filtering by star rating. | 4,5 |
+| themeIds | []integer | For facet filtering by theme ids. | 4,5 |
+| tier | string | User's access tier. | member |
+| userId | string | User ID is an authenticated user ID, e.g. the Google ID of a user. It is used for constructing ACL context. |  |
 | variations | string | Comma-separated list of AB-testing variations to apply | pp000004-tags2-b,v8th43ad-saf-search-a |
-| placeId | string | Place ID for place search. If present, takes precedence over query and geolocation. | 47319 |
-| priceMax | integer | Upper boundary for filter by price |  |
 
 
 ## Enums
-
-**<span id="/enums/language"></span>language:**
-
-| language |
-| --- |
-|ar, da, de, en, es, fi, fr, he, hu, id, it, iw, ja, ko, ms, nb, nl, no, nn, pl, pt, pt-BR, ru, sv, th, tr, zh, zh-CN, zh-HK, zh-TW|
 
 **<span id="/enums/brand"></span>brand:**
 
@@ -1875,11 +1869,23 @@ search endpoint.
 | --- |
 |findhotel, etrip, vio|
 
+**<span id="/enums/cugDeals"></span>cugDeals:**
+
+| cugDeals |
+| --- |
+|signed_in, offline, sensitive, prime, backup|
+
 **<span id="/enums/deviceType"></span>deviceType:**
 
 | deviceType |
 | --- |
 |desktop, mobile, tablet|
+
+**<span id="/enums/language"></span>language:**
+
+| language |
+| --- |
+|ar, da, de, en, es, fi, fr, he, hu, id, it, iw, ja, ko, ms, nb, nl, no, nn, pl, pt, pt-BR, ru, sv, th, tr, zh, zh-CN, zh-HK, zh-TW|
 
 **<span id="/enums/originId"></span>originId:**
 
@@ -1892,12 +1898,6 @@ search endpoint.
 | sortField |
 | --- |
 |popularity, price, privateDeals, guestRating|
-
-**<span id="/enums/cugDeals"></span>cugDeals:**
-
-| cugDeals |
-| --- |
-|signed_in, offline, sensitive, prime, backup|
 
 
 
@@ -1918,22 +1918,22 @@ SearchResponse is a response from /search handler.
 | Name | Type | Description | Example |
 | --- | --- | --- | --- |
 | anchor |  | Anchor object based on the request. - If `HotelID != ""` => it gets Anchor by Hotel (objectID: "hotel:[hotel_object_id]" objectType: "hotel") - Else if `PlaceID != ""` => it gets Anchor by Place (objectID: "place:[place_object_id]" objectType: "place") - Else if `BoundingBox != nil` => it gets Anchor by BoundingBox (objectID: "area:id" objectType: "area") - Else if `Lat != 0` and `Lon != 0` => it gets Anchor by Nearby (objectID: "point:id" objectType: "point") - Else it gets Anchor by the `Query` |  |
-| exchangeRates | object | Map of exchange rates for `EUR` and the user specified currency |  |
-| offerEntities | [OffersMap](#/definitions/OffersMap) |  |  |
-| searchParameters | [SearchRequest](#/definitions/SearchRequest) |  |  |
-| searchType | [Type](#/definitions/Type) |  |  |
-| resultsCountTotal | integer | These values are needed so client calculate whether there are more results by formula hasMoreResults = resultsCount + offset <= resultsCountTotal. Deprecated as of v1.2.x - clients need to migrate to HasMoreResults attribute. |  |
-| sortingInfo | [SortingInfo](#/definitions/SortingInfo) |  |  |
-| lov | [][Item](#/definitions/Item) |  |  |
-| offset | integer | These values are needed so client calculate whether there are more results by formula hasMoreResults = resultsCount + offset <= resultsCountTotal. Deprecated as of v1.2.x - clients need to migrate to HasMoreResults attribute. |  |
-| resultsCount | integer | These values are needed so client calculate whether there are more results by formula hasMoreResults = resultsCount + offset <= resultsCountTotal. Deprecated as of v1.2.x - clients need to migrate to HasMoreResults attribute. |  |
+| anchorHotelId | string | If the SearchType is `hotel` and we have a hotel object in our Anchor, it would be the ID of that hotel |  |
 | anchorType | string | AnchorType is either `hotel` or `place` |  |
+| exchangeRates | object | Map of exchange rates for `EUR` and the user specified currency |  |
 | facets | object | Map of Facets returned from the search result |  |
 | hasMoreResults | boolean | HasMoreResults shows if there are more results exist for the given search request, and client can request more by providing offset query parameter. |  |
+| hotelEntities | [HotelEntities](#/definitions/HotelEntities) |  |  |
 | hotelIds | []string | List of all hotel IDs in the search result |  |
 | hotelsHaveStaticPosition | boolean | HotelsHaveStaticPosition reflects whether the hotel position will depend on offers returned from RAA. |  |
-| anchorHotelId | string | If the SearchType is `hotel` and we have a hotel object in our Anchor, it would be the ID of that hotel |  |
-| hotelEntities | [HotelEntities](#/definitions/HotelEntities) |  |  |
+| lov | [][Item](#/definitions/Item) |  |  |
+| offerEntities | [OffersMap](#/definitions/OffersMap) |  |  |
+| offset | integer | These values are needed so client calculate whether there are more results by formula hasMoreResults = resultsCount + offset <= resultsCountTotal. Deprecated as of v1.2.x - clients need to migrate to HasMoreResults attribute. |  |
+| resultsCount | integer | These values are needed so client calculate whether there are more results by formula hasMoreResults = resultsCount + offset <= resultsCountTotal. Deprecated as of v1.2.x - clients need to migrate to HasMoreResults attribute. |  |
+| resultsCountTotal | integer | These values are needed so client calculate whether there are more results by formula hasMoreResults = resultsCount + offset <= resultsCountTotal. Deprecated as of v1.2.x - clients need to migrate to HasMoreResults attribute. |  |
+| searchParameters | [SearchRequest](#/definitions/SearchRequest) |  |  |
+| searchType | [Type](#/definitions/Type) |  |  |
+| sortingInfo | [SortingInfo](#/definitions/SortingInfo) |  |  |
 
 
 

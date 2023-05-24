@@ -116,6 +116,21 @@ func generateMarkdown(swagger *openapi3.T) string {
 				}
 			}
 
+			if operation.RequestBody != nil {
+				sb.WriteString("\n\n")
+				sb.WriteString("**Request Body:**\n\n")
+				sb.WriteString("| Name | Required | Type | Description | Example |\n")
+				sb.WriteString("| --- | --- | --- | --- | --- |\n")
+				for _, mediaType := range operation.RequestBody.Value.Content {
+					sb.WriteString("| " +
+						mediaType.Schema.Value.Title + " | " +
+						fmt.Sprintf("%v", mediaType.Schema.Value.Required) + " | " +
+						mediaType.Schema.Value.Type + " | " +
+						oneleline(mediaType.Schema.Value.Description) + " | " +
+						fmt.Sprintf("%v", mediaType.Schema.Value.Example) + " |\n")
+				}
+			}
+
 			sb.WriteString("**Responses:**\n\n")
 			sb.WriteString("| Status Code | Description |\n")
 			sb.WriteString("| --- | --- |\n")
