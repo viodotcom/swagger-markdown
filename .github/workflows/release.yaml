@@ -36,7 +36,7 @@ jobs:
           only-new-issues: true
 
   publish_release:
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    #if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
