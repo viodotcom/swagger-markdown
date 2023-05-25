@@ -22,6 +22,8 @@ jobs:
 
   publish_release:
     #if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    # release version number
+
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -47,7 +49,7 @@ jobs:
           mkdir -p dist/build
 
           build_binary() {
-            out="swagger-markdown_$1_$2"
+            out="swagger-markdown_$1_$2_${{ github.event.release.tag_name }}"
             if [[ $1 == "windows" ]]; then
               out="${out}.exe"
             fi
