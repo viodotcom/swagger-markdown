@@ -599,8 +599,6 @@ top-left and bottom-right corners.
 
 
 
-
-
 ---
 
 ### <span id="/definitions/Calendar">Calendar</span>
@@ -609,9 +607,7 @@ top-left and bottom-right corners.
 
 Calendar maps check in date (ISO-formatted as string) to availability entry.
 
-**Type:** map[*]->[#AvailabilityEntry](#/definitions/AvailabilityEntry)
-
-
+**Type:** map[*]->[AvailabilityEntry](#/definitions/AvailabilityEntry)
 
 
 
@@ -902,8 +898,6 @@ for a given hotel.
 
 
 
-
-
 ---
 
 ### <span id="/definitions/Decision">Decision</span>
@@ -1110,9 +1104,7 @@ for a given hotel.
 
 HotelEntities is a map of Hotel Entities with tags which are relevant to the requested stay
 
-**Type:** map[*]->[#HotelResponse](#/definitions/HotelResponse)
-
-
+**Type:** map[*]->[HotelResponse](#/definitions/HotelResponse)
 
 
 
@@ -1384,7 +1376,7 @@ HotelEntities is a map of Hotel Entities with tags which are relevant to the req
 | providerCode | string | The code of the provider that is selling the offer. |  |
 | providerRateId | string |  |  |
 | providerRateType | string | The rateType in the providers terms. |  |
-| services | array | List of services available for this offer. |  |
+| services | []unknown | List of services available for this offer. |  |
 | tags | []string |  |  |
 
 
@@ -1429,8 +1421,6 @@ HotelEntities is a map of Hotel Entities with tags which are relevant to the req
 
 
 
-
-
 ---
 
 ### <span id="/definitions/OffersMap">OffersMap</span>
@@ -1440,10 +1430,6 @@ HotelEntities is a map of Hotel Entities with tags which are relevant to the req
 OffersMap is offers map data based on each HotelID retrieved from RAA
 
 **Type:** map[*]->[][Offer](#/definitions/Offer)
-
-
-
-
 
 
 
@@ -1532,7 +1518,7 @@ OffersMap is offers map data based on each HotelID retrieved from RAA
 
 | Name | Type | Description | Example |
 | --- | --- | --- | --- |
-| capacity | integer | capacity of the room |  |
+| capacity | integer |  |  |
 | language | string |  |  |
 | name | string |  |  |
 
@@ -1730,8 +1716,6 @@ OffersMap is offers map data based on each HotelID retrieved from RAA
 <a id="/definitions/RoomsWithOffers"></a>
 
 [][RoomWithOffers](#/definitions/RoomWithOffers)
-
-
 
 
 
@@ -2029,8 +2013,6 @@ hotel, however it's not checked in the code.
 
 
 
-
-
 ---
 
 ### <span id="/definitions/TranslatedArray">TranslatedArray</span>
@@ -2041,10 +2023,6 @@ hotel, however it's not checked in the code.
 
 
 
-
-
-
-
 ---
 
 ### <span id="/definitions/TranslatedString">TranslatedString</span>
@@ -2052,8 +2030,6 @@ hotel, however it's not checked in the code.
 <a id="/definitions/TranslatedString"></a>
 
 **Type:** map[*]->string
-
-
 
 
 
@@ -2078,8 +2054,6 @@ according to the request parameters (hotelID, PlaceID, BoundingBox, Nearby or Qu
 <a id="/definitions/Variations"></a>
 
 []string
-
-
 
 
 

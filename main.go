@@ -58,6 +58,7 @@ func generateMarkdown(swagger *openapi3.T) string {
 	if swagger.Info != nil {
 		sb.WriteString("# " + swagger.Info.Title + "\n\n")
 		sb.WriteString(swagger.Info.Description + "\n\n")
+
 		if swagger.Info.Contact != nil {
 			sb.WriteString(swagger.Info.Contact.Name + "\n\n")
 			sb.WriteString(swagger.Info.Contact.URL + "\n\n")
@@ -65,11 +66,12 @@ func generateMarkdown(swagger *openapi3.T) string {
 		}
 	}
 
-	// generate a table of all paths with the link to the path
+	// Generate a table of all paths with the link to the path
 	sb.WriteString("## Paths\n\n")
 	sb.WriteString("| Path | Operations |\n")
 	sb.WriteString("| --- | --- |\n")
-	// sort paths by path name
+
+	// Sort paths by path name
 	paths := make([]string, 0, len(swagger.Paths))
 	for path := range swagger.Paths {
 		paths = append(paths, path)
@@ -79,9 +81,11 @@ func generateMarkdown(swagger *openapi3.T) string {
 	for _, path := range paths {
 		pathItem := swagger.Paths[path]
 		sb.WriteString("| [" + path + "](#path" + strings.ToLower(path) + ") | ")
+
 		for method := range pathItem.Operations() {
 			sb.WriteString(method + " ")
 		}
+
 		sb.WriteString("|\n")
 	}
 
@@ -99,20 +103,21 @@ func generateMarkdown(swagger *openapi3.T) string {
 			sb.WriteString("**Parameters:**\n\n")
 			sb.WriteString("| Name | Required | Type | Description | Example |\n")
 			sb.WriteString("| --- | --- | --- | --- | --- |\n")
+
 			for _, parameter := range operation.Parameters {
 				if parameter.Value != nil {
-					sb.WriteString("| " +
-						parameter.Value.Name + " | " +
-						fmt.Sprintf("%v", parameter.Value.Required) + " | ")
+					sb.WriteString("| " + parameter.Value.Name + " | ")
+					sb.WriteString(fmt.Sprintf("%v", parameter.Value.Required) + " | ")
+
 					typ, ok := parameter.Value.Extensions["type"]
 					if ok {
 						sb.WriteString(typ.(string) + " | ")
 					} else {
 						sb.WriteString(" | ")
 					}
-					sb.WriteString(
-						oneleline(parameter.Value.Description) + " | " +
-							fmt.Sprintf("%v", parameter.Value.Example) + " |\n")
+
+					sb.WriteString(oneleline(parameter.Value.Description) + " | ")
+					sb.WriteString(fmt.Sprintf("%v", parameter.Value.Example) + " |\n")
 				}
 			}
 
@@ -121,13 +126,13 @@ func generateMarkdown(swagger *openapi3.T) string {
 				sb.WriteString("**Request Body:**\n\n")
 				sb.WriteString("| Name | Required | Type | Description | Example |\n")
 				sb.WriteString("| --- | --- | --- | --- | --- |\n")
+
 				for _, mediaType := range operation.RequestBody.Value.Content {
-					sb.WriteString("| " +
-						mediaType.Schema.Value.Title + " | " +
-						fmt.Sprintf("%v", mediaType.Schema.Value.Required) + " | " +
-						mediaType.Schema.Value.Type + " | " +
-						oneleline(mediaType.Schema.Value.Description) + " | " +
-						fmt.Sprintf("%v", mediaType.Schema.Value.Example) + " |\n")
+					sb.WriteString("| " + mediaType.Schema.Value.Title + " | ")
+					sb.WriteString(fmt.Sprintf("%v", mediaType.Schema.Value.Required) + " | ")
+					sb.WriteString(mediaType.Schema.Value.Type + " | ")
+					sb.WriteString(oneleline(mediaType.Schema.Value.Description) + " | ")
+					sb.WriteString(fmt.Sprintf("%v", mediaType.Schema.Value.Example) + " |\n")
 				}
 			}
 
@@ -135,213 +140,205 @@ func generateMarkdown(swagger *openapi3.T) string {
 			sb.WriteString("| Status Code | Description |\n")
 			sb.WriteString("| --- | --- |\n")
 
-			// sort responses by status code
+			// Sort responses by status code
 			statusCodes := make([]string, 0, len(operation.Responses))
 			for statusCode := range operation.Responses {
 				statusCodes = append(statusCodes, statusCode)
 			}
 			sort.Strings(statusCodes)
+
 			for _, statusCode := range statusCodes {
 				response := operation.Responses[statusCode]
 				description := ""
+
 				if response.Value.Description != nil {
 					description = oneleline(*response.Value.Description)
 				}
+
 				linkToSchema := ""
 				ext, ok := response.Value.Extensions["schema"]
 				if ok {
-					ref, ok := ext.(map[string]interface{})["$ref"]
+					ref, ok := ext.(map[string]any)["$ref"]
 					if ok {
 						linkToSchema = ref.(string)
 					}
 				}
-				// replace "#/definitions/" with "#definitions/" to make it work in GitHub
-				//linkToSchema = strings.ReplaceAll(linkToSchema, "#/", "#")
+
 				sb.WriteString("| " + statusCode + " | [" + description + "](" + linkToSchema + ") |\n")
 			}
+
 			sb.WriteString("\n\n---\n\n") // Add a separator between each method
 		}
 	}
 
 	sb.WriteString("## Definitions\n\n")
 	definitions, ok := swagger.Extensions["definitions"]
+
 	if ok {
-		definitionsMap, ok := definitions.(map[string]interface{})
+		definitionsMap, ok := definitions.(map[string]any)
 		if ok {
 			sb.WriteString(markDownDefinitions(definitionsMap))
 		}
-
 	}
 
 	return sb.String()
 }
 
-func markDownDefinitions(definitionsMap map[string]interface{}) string {
-	sb := strings.Builder{}
-	// sort definitions by name
+func markDownDefinitions(definitionsMap map[string]any) string {
+	var sb strings.Builder
+
+	// Sort definitions by name
 	definitionNames := make([]string, 0, len(definitionsMap))
 	for name := range definitionsMap {
 		definitionNames = append(definitionNames, name)
 	}
 	sort.Strings(definitionNames)
+
 	for _, name := range definitionNames {
 		schema := definitionsMap[name]
-		sb.WriteString("### <span id=\"/definitions/" + name + "\">" + name + "</span>\n\n")
-		sb.WriteString("<a id=\"/definitions/" + name + "\"></a>\n\n")
-		schemaMap := schema.(map[string]interface{})
-		title, ok := schemaMap["title"].(string)
-		if ok {
+		sb.WriteString(fmt.Sprintf("### <span id=\"/definitions/%s\">%s</span>\n\n", name, name))
+		sb.WriteString(fmt.Sprintf("<a id=\"/definitions/%s\"></a>\n\n", name))
+
+		schemaMap, ok := schema.(map[string]any)
+		if !ok {
+			continue
+		}
+
+		if title, ok := schemaMap["title"].(string); ok {
 			sb.WriteString(title + "\n\n")
 		}
-		description, ok := schemaMap["description"].(string)
-		if ok {
+
+		if description, ok := schemaMap["description"].(string); ok {
 			sb.WriteString(description + "\n\n")
 		}
 
-		if schemaMap["type"] == "object" {
+		switch schemaMap["type"] {
+		case "object":
 			sb.WriteString(objectMarkDown(schemaMap) + "\n\n")
-		} else if schemaMap["type"] == "array" {
+		case "array":
 			sb.WriteString(arrayMarkDown(schemaMap) + "\n\n")
-		} else {
-			sb.WriteString("**Type:** " + schemaMap["type"].(string) + "\n\n")
+		default:
+			sb.WriteString(fmt.Sprintf("**Type:** %s\n\n", schemaMap["type"]))
 		}
 
 		sb.WriteString("\n\n---\n\n")
 	}
+
 	return sb.String()
 }
 
 func oneleline(input string) string {
-	return strings.ReplaceAll(input, "\n", " ")
+	return strings.TrimSpace(strings.ReplaceAll(input, "\n", " "))
 }
 
-func detectObjectGoType(schemaMap map[string]interface{}) string {
-	_, ok := schemaMap["properties"]
-	goType := "object"
-	if !ok {
-		_, ok = schemaMap["additionalProperties"]
-		goType = "map"
-		if !ok {
-			return ""
-		}
+func detectObjectGoType(schemaMap map[string]any) string {
+	if _, ok := schemaMap["properties"]; ok {
+		return "object"
 	}
-	return goType
-}
 
-func objectMarkDown(schemaMap map[string]interface{}) string {
-	goType := detectObjectGoType(schemaMap)
-	if goType == "object" {
-		return objectMD(schemaMap)
-	} else if goType == "map" {
-		return mapMD(schemaMap)
+	if _, ok := schemaMap["additionalProperties"]; ok {
+		return "map"
 	}
+
 	return ""
 }
 
-func objectMD(schemaMap map[string]interface{}) string {
-	sb := strings.Builder{}
+func objectMarkDown(schemaMap map[string]any) string {
+	goType := detectObjectGoType(schemaMap)
 
+	switch goType {
+	case "object":
+		return objectMD(schemaMap)
+	case "map":
+		return mapMD(schemaMap)
+	default:
+		return ""
+	}
+}
+
+func objectMD(schemaMap map[string]any) string {
 	properties, ok := schemaMap["properties"]
 	if !ok {
 		return ""
 	}
 
-	propertiesMap, ok := properties.(map[string]interface{})
+	propertiesMap, ok := properties.(map[string]any)
 	if !ok {
 		return ""
 	}
+
+	var sb strings.Builder
 	sb.WriteString("**Type:** object\n\n")
 	sb.WriteString("**Properties:**\n\n")
 	sb.WriteString("| Name | Type | Description | Example |\n")
 	sb.WriteString("| --- | --- | --- | --- |\n")
-	enumInformations := make(map[string][]string, 0)
 
-	// sort properties by name
+	enumInformations := make(map[string][]string)
+
+	// Sort properties by name
 	propertyNames := make([]string, 0, len(propertiesMap))
 	for name := range propertiesMap {
 		propertyNames = append(propertyNames, name)
 	}
 	sort.Strings(propertyNames)
+
 	for _, propertyName := range propertyNames {
 		property := propertiesMap[propertyName]
-		propertyMap := property.(map[string]interface{})
-		typ, ok := propertyMap["type"]
-		var typeText string
-		if ok {
-			typeText, _ = typ.(string)
+		propertyMap, ok := property.(map[string]any)
+		if !ok {
+			continue
 		}
 
-		ref, ok := propertyMap["$ref"]
-		var refLink string
-		if ok {
-			refLink, _ = ref.(string)
+		typ := ""
+		if propertyType, ok := propertyMap["type"].(string); ok {
+			typ = propertyType
 		}
 
-		description, ok := propertyMap["description"]
-		var descriptionText string
-		if ok {
-			descriptionText, _ = description.(string)
+		if refLink, ok := propertyMap["$ref"].(string); ok {
+			refText := strings.TrimPrefix(refLink, "#/definitions/")
+			typ = fmt.Sprintf("[%s](%s)", refText, refLink)
+		} else if typ == "array" {
+			typ = arrayMarkDown(propertyMap)
 		}
 
-		example, ok := propertyMap["example"]
-		var exampleText string
-		if ok {
-			exampleText, _ = example.(string)
+		description := ""
+		if propertyDescription, ok := propertyMap["description"].(string); ok {
+			description = oneleline(propertyDescription)
 		}
 
-		enums, ok := propertyMap["enum"]
-		var enumsTexts []string
-		if ok {
-			enumsArray, ok := enums.([]interface{})
-			if ok {
-				for _, enum := range enumsArray {
-					enumsTexts = append(enumsTexts, enum.(string))
-				}
-				enumInformations[propertyName] = enumsTexts
-			}
+		example := ""
+		if propertyExample, ok := propertyMap["example"].(string); ok {
+			example = propertyExample
 		}
 
-		if refLink != "" {
-			refText := strings.ReplaceAll(refLink, "#/definitions/", "")
-			typeText = "[" + refText + "]" + "(" + refLink + ")"
-		} else if typeText == "array" {
-			items, ok := propertyMap["items"]
-			if ok {
-				itemsMap := items.(map[string]interface{})
-				ref, ok := itemsMap["$ref"]
-				if ok {
-					refLink, _ = ref.(string)
-					refText := strings.ReplaceAll(refLink, "#/definitions/", "")
-					typeText = "[][" + refText + "]" + "(" + refLink + ")"
-				} else {
-					typ, ok := itemsMap["type"]
-					if ok {
-						arrayTypeText, _ := typ.(string)
-						typeText = "[]" + arrayTypeText
-					}
+		enums := []string{}
+		if propertyEnums, ok := propertyMap["enum"].([]any); ok {
+			for _, enum := range propertyEnums {
+				if enumValue, ok := enum.(string); ok {
+					enums = append(enums, enumValue)
 				}
 			}
-		}
-		if len(enumsTexts) > 0 {
-			typeText = typeText + " ([enums](#/enums/" + propertyName + "))"
+			enumInformations[propertyName] = enums
+			typ = fmt.Sprintf("%s ([enums](#/enums/%s))", typ, propertyName)
 		}
 
-		sb.WriteString("| " + propertyName + " | " + typeText + " | " + oneleline(descriptionText) + " | " + exampleText + " |\n")
+		sb.WriteString(fmt.Sprintf("| %s | %s | %s | %s |\n", propertyName, typ, description, example))
 	}
 
 	if len(enumInformations) > 0 {
 		sb.WriteString("\n\n")
 		sb.WriteString("## Enums\n\n")
 
-		// sort enums by name
+		// Sort enums by name
 		enumNames := make([]string, 0, len(enumInformations))
 		for name := range enumInformations {
 			enumNames = append(enumNames, name)
 		}
 		sort.Strings(enumNames)
+
 		for _, enumName := range enumNames {
 			enumValues := enumInformations[enumName]
-			sb.WriteString("**<span id=\"/enums/" + enumName + "\"></span>" + enumName + ":**\n\n")
+			sb.WriteString(fmt.Sprintf("**<span id=\"/enums/%s\"></span>%s:**\n\n", enumName, enumName))
 			sb.WriteString("| " + enumName + " |\n")
 			sb.WriteString("| --- |\n")
 			sb.WriteString("|" + strings.Join(enumValues, ", ") + "|\n\n")
@@ -351,85 +348,70 @@ func objectMD(schemaMap map[string]interface{}) string {
 	return sb.String()
 }
 
-func mapMD(schemaMap map[string]interface{}) string {
+func mapMD(schemaMap map[string]any) string {
 	sb := strings.Builder{}
+
 	additionalProperties, ok := schemaMap["additionalProperties"]
 	if !ok {
 		return ""
 	}
-	additionalPropertiesMap, ok := additionalProperties.(map[string]interface{})
+
+	additionalPropertiesMap, ok := additionalProperties.(map[string]any)
 	if !ok {
 		return ""
 	}
+
 	sb.WriteString("**Type:** map[*]->")
-	ref, ok := additionalPropertiesMap["$ref"]
-	if ok {
-		refLink, ok := ref.(string)
-		if ok {
-			objectName := strings.ReplaceAll(refLink, "#/definitions/", "#")
-			sb.WriteString("[" + objectName + "](" + refLink + ")\n\n")
-		}
+
+	if ref, ok := additionalPropertiesMap["$ref"].(string); ok {
+		objectName := strings.ReplaceAll(ref, "#/definitions/", "")
+		sb.WriteString("[" + objectName + "](" + ref + ")")
 	} else if additionalPropertiesMap["type"] == "array" {
-		sb.WriteString(arrayMarkDown(additionalPropertiesMap) + "\n\n")
+		sb.WriteString(arrayMarkDown(additionalPropertiesMap))
 	} else if additionalPropertiesMap["type"] == "object" {
-		sb.WriteString(objectMarkDown(additionalPropertiesMap) + "\n\n")
-	} else {
-		mapValueText, ok := additionalPropertiesMap["type"].(string)
-		if ok {
-			sb.WriteString(mapValueText + "\n\n")
-		}
+		sb.WriteString(objectMarkDown(additionalPropertiesMap))
+	} else if mapValueText, ok := additionalPropertiesMap["type"].(string); ok {
+		sb.WriteString(mapValueText)
 	}
+
 	return sb.String()
 }
 
-func arrayMarkDown(schemaMap map[string]interface{}) string {
+func arrayMarkDown(schemaMap map[string]any) string {
 	sb := strings.Builder{}
 	sb.WriteString("[]")
-	items, ok := schemaMap["items"]
-	if ok {
-		itemsMap, ok := items.(map[string]interface{})
-		if ok {
-			ref, ok := itemsMap["$ref"]
-			if ok {
-				refLink, ok := ref.(string)
-				if ok {
-					objectName := strings.ReplaceAll(refLink, "#/definitions/", "")
-					sb.WriteString("[" + objectName + "](" + refLink + ")\n\n")
-				}
-			} else {
-				itemsMapItems, ok := itemsMap["items"]
-				if ok {
-					itemsMapItemsMap, ok := itemsMapItems.(map[string]interface{})
-					if ok {
-						typ, ok := itemsMapItemsMap["type"]
-						if ok {
-							typText, ok := typ.(string)
-							if ok {
-								if typText == "object" {
-									sb.WriteString(objectMarkDown(itemsMapItemsMap) + "\n\n")
-								} else if typText == "array" {
-									sb.WriteString(arrayMarkDown(itemsMapItemsMap) + "\n\n")
-								} else {
-									sb.WriteString(typText + "\n\n")
-								}
-							}
-						}
-					}
-				} else if itemsMap["type"] == "array" {
-					sb.WriteString(arrayMarkDown(itemsMap) + "\n\n")
-				} else if itemsMap["type"] == "object" {
-					sb.WriteString(objectMarkDown(itemsMap) + "\n\n")
-				} else {
-					typ, ok := itemsMap["type"]
-					if ok {
-						typText, ok := typ.(string)
-						if ok {
-							sb.WriteString(typText + "\n\n")
-						}
-					}
-				}
+
+	items, ok := schemaMap["items"].(map[string]any)
+	if !ok {
+		return sb.String()
+	}
+
+	if typ, ok := items["type"].(string); ok {
+		switch typ {
+		case "object":
+			sb.WriteString(objectMarkDown(items))
+		case "array":
+			sb.WriteString(arrayMarkDown(items))
+		default:
+			sb.WriteString(typ)
+		}
+	} else if ref, ok := items["$ref"].(string); ok {
+		objectName := strings.TrimPrefix(ref, "#/definitions/")
+		sb.WriteString(fmt.Sprintf("[%s](%s)", objectName, ref))
+	} else if itemsItems, ok := items["items"].(map[string]any); ok {
+		if typ, ok := itemsItems["type"].(string); ok {
+			switch typ {
+			case "object":
+				sb.WriteString(objectMarkDown(itemsItems))
+			case "array":
+				sb.WriteString(arrayMarkDown(itemsItems))
+			default:
+				sb.WriteString(typ)
 			}
 		}
+	} else {
+		sb.WriteString("unknown")
 	}
+
 	return sb.String()
 }
