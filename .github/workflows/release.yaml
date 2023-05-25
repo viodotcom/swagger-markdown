@@ -36,6 +36,12 @@ jobs:
           check-latest: true
           cache: true
 
+      - name: Get release
+        id: get_release
+        uses: bruceadams/get-release@v1.3.2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
       - name: Install Tools
         run: |
           go install github.com/aktau/github-release@latest
@@ -49,7 +55,7 @@ jobs:
           mkdir -p dist/build
 
           build_binary() {
-            out="swagger-markdown_$1_$2_${{ github.event.release.tag_name }}"
+            out="swagger-markdown_$1_$2_${{ steps.get_release.outputs.tag_name }}"
             if [[ $1 == "windows" ]]; then
               out="${out}.exe"
             fi
