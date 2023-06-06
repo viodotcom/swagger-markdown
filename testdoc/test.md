@@ -22,7 +22,7 @@ sapi-squad@findhotel.net
 | [/offers](#path/offers) | GET |
 | [/room](#path/room) | GET |
 | [/rooms-offers](#path/rooms-offers) | GET |
-| [/search](#path/search) | GET POST |
+| [/search](#path/search) | GET, POST |
 
 
 ## <span id="path/acl">/acl</span>

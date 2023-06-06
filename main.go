@@ -82,11 +82,13 @@ func generateMarkdown(swagger *openapi3.T) string {
 		pathItem := swagger.Paths[path]
 		sb.WriteString("| [" + path + "](#path" + strings.ToLower(path) + ") | ")
 
+		methods := make([]string, 0, len(pathItem.Operations()))
 		for method := range pathItem.Operations() {
-			sb.WriteString(method + " ")
+			methods = append(methods, method)
 		}
+		sort.Strings(methods)
+		sb.WriteString(strings.Join(methods, ", ") + " |\n")
 
-		sb.WriteString("|\n")
 	}
 
 	sb.WriteString("\n\n")
