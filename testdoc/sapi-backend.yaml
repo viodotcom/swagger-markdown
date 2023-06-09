@@ -17,7 +17,7 @@ definitions:
                 description: |-
                     topLeft and bottomRight coordinates of bounding box to perform search inside it.
 
-                    The format is `LatTopLeft,LonTopLeft,LatBottomRight,LonBottomRight`
+                    The format is `TopLeftLat,TopLeftLon,BottomRightLat,BottomRightLon`
 
                     The types are all float64 numbers.
                 example: 46.650828100116044,7.123046875,45.17210966999772,1.009765625
@@ -263,7 +263,7 @@ definitions:
                 type: string
             offers:
                 items:
-                    $ref: '#/definitions/Offer'
+                    $ref: '#/definitions/HotelOffer'
                 type: array
             rooms:
                 additionalProperties:
@@ -302,21 +302,23 @@ definitions:
         type: object
     BoundingBox:
         description: |-
-            BoundingBox represents a "rectangle" between provided coordinates of
-            top-left and bottom-right corners.
+            The rectangle is defined by two diagonally opposite points (hereafter TopLeft and BottomRight),
+            hence by 4 floats: TopLeftLat, TopLeftLon, BottomRightLat, BottomRightLon.
+            For example: BoundingBox = [ 47.3165, 4.9665, 47.3424, 5.0201 ]
         properties:
-            LatBottomRight:
+            BottomRightLat:
                 format: double
                 type: number
-            LatTopLeft:
+            BottomRightLon:
                 format: double
                 type: number
-            LonBottomRight:
+            TopLeftLat:
                 format: double
                 type: number
-            LonTopLeft:
+            TopLeftLon:
                 format: double
                 type: number
+        title: BoundingBox represents a "rectangle".
         type: object
     BreakdownFee:
         items:
@@ -726,6 +728,43 @@ definitions:
             total:
                 type: string
         type: object
+    HotelOffer:
+        properties:
+            accessTier:
+                type: string
+            availableRooms:
+                format: int64
+                type: integer
+            cancellationPenalties:
+                items:
+                    $ref: '#/definitions/CancellationPenalty'
+                type: array
+            currency:
+                type: string
+            id:
+                type: string
+            intermediaryProvider:
+                type: string
+            metadata:
+                $ref: '#/definitions/Metadata'
+            occupancy:
+                format: int64
+                type: integer
+            package:
+                $ref: '#/definitions/Package'
+            providerCode:
+                type: string
+            rate:
+                $ref: '#/definitions/Rate'
+            roomID:
+                type: string
+            tags:
+                items:
+                    type: string
+                type: array
+            url:
+                type: string
+        type: object
     HotelResponse:
         properties:
             _geoloc:
@@ -848,7 +887,7 @@ definitions:
                 type: string
             offers:
                 items:
-                    $ref: '#/definitions/Offer'
+                    $ref: '#/definitions/HotelOffer'
                 type: array
             rooms:
                 additionalProperties:
@@ -1005,77 +1044,6 @@ definitions:
             precision:
                 $ref: '#/definitions/PrecisionRanges'
         type: object
-    Offer:
-        properties:
-            availableRooms:
-                description: The number of similar rooms the provider still have available.
-                format: int64
-                type: integer
-            canPayLater:
-                description: Shows if the user can be charged later for the offer.
-                type: boolean
-            cancellationPenalties:
-                description: The list of penalties applied to the cancellation of the offer.
-                items:
-                    $ref: '#/definitions/CancellationPenalty'
-                type: array
-            cug:
-                description: Access tier from Offers data model. Contains the minimum tier the user should be in order to access this offer.
-                items:
-                    type: string
-                type: array
-            extraParams: {}
-            id:
-                description: Offer ID from Offers data model.
-                type: string
-            isClicked:
-                description: True if the offer was matched with clicked offer from the search page
-                type: boolean
-            links:
-                description: Array of one item containing a link to book the offer.
-                items:
-                    $ref: '#/definitions/RoomLink'
-                type: array
-            matchType:
-                description: |-
-                    Type of clicked offer matching. 'exact' means price and all terms are matched. 'by_price' means price and
-                    some of terms (but not all) are matched. 'by_terms' means all terms are matched.
-                    Terms are freeCancellation, services, room name, payLater, offerType (public or private).
-                enum:
-                    - exact
-                    - by_price
-                    - by_terms
-                type: string
-            matchedDim:
-                $ref: '#/definitions/MatchedDim'
-            matchedOfferPriceDiff:
-                description: |-
-                    In case of match, contains the absolute price diff in the same currency used to return the price.
-                    The diff is positive in case of the new price is higher and negative in case of the new price is lower.
-                format: double
-                type: number
-            prices:
-                description: Array of prices containing user currency where chargeable are multiplied by number of rooms.
-                items:
-                    $ref: '#/definitions/RoomPrice'
-                type: array
-            providerCode:
-                description: The code of the provider that is selling the offer.
-                type: string
-            providerRateId:
-                type: string
-            providerRateType:
-                description: The rateType in the providers terms.
-                type: string
-            services:
-                description: List of services available for this offer.
-                items: {}
-                type: array
-            tags:
-                items:
-                    type: string
-                type: array
-        type: object
     OfferRate:
         properties:
             base:
@@ -1093,12 +1061,12 @@ definitions:
         type: object
     Offers:
         items:
-            $ref: '#/definitions/Offer'
+            $ref: '#/definitions/RoomsOffer'
         type: array
     OffersMap:
         additionalProperties:
             items:
-                $ref: '#/definitions/Offer'
+                $ref: '#/definitions/HotelOffer'
             type: array
         description: OffersMap is offers map data based on each HotelID retrieved from RAA
         type: object
@@ -1150,6 +1118,7 @@ definitions:
     RAARoom:
         properties:
             capacity:
+                description: capacity of the room
                 format: int64
                 type: integer
             language:
@@ -1375,6 +1344,79 @@ definitions:
                     type: string
                 type: array
         type: object
+    RoomsOffer:
+        properties:
+            availableRooms:
+                description: The number of similar rooms the provider still have available.
+                format: int64
+                type: integer
+            canPayLater:
+                description: Shows if the user can be charged later for the offer.
+                type: boolean
+            cancellationPenalties:
+                description: The list of penalties applied to the cancellation of the offer.
+                items:
+                    $ref: '#/definitions/CancellationPenalty'
+                type: array
+            cug:
+                description: Access tier from Offers data model. Contains the minimum tier the user should be in order to access this offer.
+                items:
+                    type: string
+                type: array
+            extraParams: {}
+            id:
+                description: Offer ID from Offers data model.
+                type: string
+            isClicked:
+                description: True if the offer was matched with clicked offer from the search page
+                type: boolean
+            links:
+                description: Array of one item containing a link to book the offer.
+                items:
+                    $ref: '#/definitions/RoomLink'
+                type: array
+            matchType:
+                description: |-
+                    Type of clicked offer matching. 'exact' means price and all terms are matched. 'by_price' means price and
+                    some of terms (but not all) are matched. 'by_terms' means all terms are matched.
+                    Terms are freeCancellation, services, room name, payLater, offerType (public or private).
+                enum:
+                    - exact
+                    - by_price
+                    - by_terms
+                type: string
+            matchedDim:
+                $ref: '#/definitions/MatchedDim'
+            matchedOfferPriceDiff:
+                description: |-
+                    In case of match, contains the absolute price diff in the same currency used to return the price.
+                    The diff is positive in case of the new price is higher and negative in case of the new price is lower.
+                format: double
+                type: number
+            metadata:
+                $ref: '#/definitions/Metadata'
+            prices:
+                description: Array of prices containing user currency where chargeable are multiplied by number of rooms.
+                items:
+                    $ref: '#/definitions/RoomPrice'
+                type: array
+            providerCode:
+                description: The code of the provider that is selling the offer.
+                type: string
+            providerRateId:
+                type: string
+            providerRateType:
+                description: The rateType in the providers terms.
+                type: string
+            services:
+                description: List of services available for this offer.
+                items: {}
+                type: array
+            tags:
+                items:
+                    type: string
+                type: array
+        type: object
     RoomsResponse:
         properties:
             rooms:
@@ -1471,7 +1513,7 @@ definitions:
                 description: |-
                     topLeft and bottomRight coordinates of bounding box to perform search inside it.
 
-                    The format is `LatTopLeft,LonTopLeft,LatBottomRight,LonBottomRight`
+                    The format is `TopLeftLat,TopLeftLon,BottomRightLat,BottomRightLon`
 
                     The types are all float64 numbers.
                 example: 46.650828100116044,7.123046875,45.17210966999772,1.009765625
@@ -1998,7 +2040,7 @@ paths:
                         $ref: '#/definitions/Decision'
             schemes:
                 - https
-            summary: /acl
+            summary: '# /acl'
     /anchor:
         get:
             consumes:
@@ -2007,8 +2049,8 @@ paths:
             operationId: anchor
             parameters:
                 - description: |-
-                      Amount of full days from now to desired check in date (works in
-                      combination with nights parameter).
+                    Amount of full days from now to desired check in date (works in
+                    combination with nights parameter).
                   example: 15
                   format: int64
                   in: query
@@ -2048,20 +2090,20 @@ paths:
                   type: number
                 - $ref: '#/definitions/PrecisionRanges'
                   description: |-
-                      Precision holds ranges of precisions in the format of "from1-value1,from2-value2,from3-value3"
-                      where from is the distance in meters from the geolocation and value is the precision value in meters.
-                      For example, if the geolocation is 10 meters away from the object, the precision value will be 25 meters
-                      until the distance is 2000 meters.
-                      For the locations in 2000 meters away, the precision value will be 100 meters until the distance is 5000 meters.
-                      And so on.
+                    Precision holds ranges of precisions in the format of "from1-value1,from2-value2,from3-value3"
+                    where from is the distance in meters from the geolocation and value is the precision value in meters.
+                    For example, if the geolocation is 10 meters away from the object, the precision value will be 25 meters
+                    until the distance is 2000 meters.
+                    For the locations in 2000 meters away, the precision value will be 100 meters until the distance is 5000 meters.
+                    And so on.
                   in: query
                   name: precision
                 - description: |-
-                      topLeft and bottomRight coordinates of bounding box to perform search inside it.
-                      
-                      The format is `LatTopLeft,LonTopLeft,LatBottomRight,LonBottomRight`
-                      
-                      The types are all float64 numbers.
+                    topLeft and bottomRight coordinates of bounding box to perform search inside it.
+
+                    The format is `TopLeftLat,TopLeftLon,BottomRightLat,BottomRightLon`
+
+                    The types are all float64 numbers.
                   example: 46.650828100116044,7.123046875,45.17210966999772,1.009765625
                   format: coordinates
                   in: query
@@ -2086,15 +2128,15 @@ paths:
                   type: string
                 - description: Codes of closed user group deals to retrieve offers
                   enum:
-                      - signed_in
-                      - offline
-                      - sensitive
-                      - prime
-                      - backup
+                    - signed_in
+                    - offline
+                    - sensitive
+                    - prime
+                    - backup
                   example: signed_in,offline
                   in: query
                   items:
-                      type: string
+                    type: string
                   name: cugDeals
                   type: array
                 - description: User's access tier.
@@ -2108,20 +2150,20 @@ paths:
                   type: string
                 - default: desktop
                   description: |-
-                      The type of the requestor's device.
-                      If it isn't specified then the server determines it from User-Agent request header.
-                      If the server couldn't determine it, then value is set to desktop.
+                    The type of the requestor's device.
+                    If it isn't specified then the server determines it from User-Agent request header.
+                    If the server couldn't determine it, then value is set to desktop.
                   enum:
-                      - desktop
-                      - mobile
-                      - tablet
+                    - desktop
+                    - mobile
+                    - tablet
                   example: desktop
                   in: query
                   name: deviceType
                   type: string
                 - description: |-
-                      The 2-char ISO 3166 country code of a requestor.
-                      If not specified then the server determines it from the client's IP address.
+                    The 2-char ISO 3166 country code of a requestor.
+                    If not specified then the server determines it from the client's IP address.
                   in: query
                   maxLength: 2
                   minLength: 2
@@ -2130,19 +2172,19 @@ paths:
                 - default: c3po6twr70
                   description: Identifier of origin where the request was originated
                   enum:
-                      - c3po6twr70
-                      - r2d2m73kn8
-                      - ig88zpd1k7
-                      - bb8lf9nscr
+                    - c3po6twr70
+                    - r2d2m73kn8
+                    - ig88zpd1k7
+                    - bb8lf9nscr
                   example: c3po6twr70
                   in: query
                   name: originId
                   type: string
                 - description: Brand of an application that uses Sapi. Required to do RAA profile selection
                   enum:
-                      - findhotel
-                      - etrip
-                      - vio
+                    - findhotel
+                    - etrip
+                    - vio
                   example: findhotel
                   in: query
                   name: brand
@@ -2160,21 +2202,21 @@ paths:
                   name: rooms
                   type: string
                 - description: |-
-                      A correlation id used in Analytics to identify different searches.
-                      Sapi SDK generates a new unique value per each new user search and passes it to Sapi Backend to both /search and /offers endpoints, the same value.
-                      Value is changed when a new search initiated, check documentation for Sapi SDK for details what is considered a new search.
-                      
-                      Sapi Backend passes it to RAA when retrieving offers.
-                      
-                      If not provided, generated as UUID.
-                      nolint:lll
+                    A correlation id used in Analytics to identify different searches.
+                    Sapi SDK generates a new unique value per each new user search and passes it to Sapi Backend to both /search and /offers endpoints, the same value.
+                    Value is changed when a new search initiated, check documentation for Sapi SDK for details what is considered a new search.
+
+                    Sapi Backend passes it to RAA when retrieving offers.
+
+                    If not provided, generated as UUID.
+                    nolint:lll
                   in: query
                   name: searchId
                   type: string
                 - description: |-
-                      Indicates to boost the OSO ranking of some offers, based on the criteria in the parameter.
-                      For example freeCancellation=true:100 value will multiply the oso score by 100 for offers that have free cancellation.
-                      The boost is only supported for freeCancellation at the moment.
+                    Indicates to boost the OSO ranking of some offers, based on the criteria in the parameter.
+                    For example freeCancellation=true:100 value will multiply the oso score by 100 for offers that have free cancellation.
+                    The boost is only supported for freeCancellation at the moment.
                   example: freeCancellation=true:100
                   in: query
                   name: sortingBoost
@@ -2189,36 +2231,36 @@ paths:
                 - default: en
                   description: Language code of a visitor
                   enum:
-                      - ar
-                      - da
-                      - de
-                      - en
-                      - es
-                      - fi
-                      - fr
-                      - he
-                      - hu
-                      - id
-                      - it
-                      - iw
-                      - ja
-                      - ko
-                      - ms
-                      - nb
-                      - nl
-                      - "no"
-                      - nn
-                      - pl
-                      - pt
-                      - pt-BR
-                      - ru
-                      - sv
-                      - th
-                      - tr
-                      - zh
-                      - zh-CN
-                      - zh-HK
-                      - zh-TW
+                    - ar
+                    - da
+                    - de
+                    - en
+                    - es
+                    - fi
+                    - fr
+                    - he
+                    - hu
+                    - id
+                    - it
+                    - iw
+                    - ja
+                    - ko
+                    - ms
+                    - nb
+                    - nl
+                    - "no"
+                    - nn
+                    - pl
+                    - pt
+                    - pt-BR
+                    - ru
+                    - sv
+                    - th
+                    - tr
+                    - zh
+                    - zh-CN
+                    - zh-HK
+                    - zh-TW
                   example: en
                   in: query
                   name: Language
@@ -2238,7 +2280,7 @@ paths:
                   example: hotelEntities
                   in: query
                   items:
-                      type: string
+                    type: string
                   name: Attributes
                   type: array
                 - description: Unique ID identifying users
@@ -2267,7 +2309,7 @@ paths:
                         $ref: '#/definitions/AnchorResponse'
             schemes:
                 - https
-            summary: /anchor
+            summary: '# /anchor'
     /availability:
         get:
             consumes:
@@ -2276,9 +2318,9 @@ paths:
             operationId: availability
             parameters:
                 - description: |-
-                      Token is a pagination token that clients send on follow-up
-                      requests if complete=false.  Sapi uses this token to mediate
-                      long-polling response.
+                    Token is a pagination token that clients send on follow-up
+                    requests if complete=false.  Sapi uses this token to mediate
+                    long-polling response.
                   in: query
                   name: token
                   type: string
@@ -2289,8 +2331,8 @@ paths:
                   name: startDate
                   type: string
                 - description: |-
-                      ISO date of last check in (including). Can't be further than 61
-                      days from StartDate.
+                    ISO date of last check in (including). Can't be further than 61
+                    days from StartDate.
                   example: "2021-10-11"
                   format: date
                   in: query
@@ -2306,14 +2348,14 @@ paths:
                   type: integer
                 - description: Codes of closed user group deals to retrieve from RAA.
                   enum:
-                      - signed_in
-                      - offline
-                      - sensitive
-                      - prime
-                      - backup
+                    - signed_in
+                    - offline
+                    - sensitive
+                    - prime
+                    - backup
                   in: query
                   items:
-                      type: string
+                    type: string
                   name: cugDeals
                   type: array
                 - description: User's access tier.
@@ -2330,7 +2372,7 @@ paths:
                 - description: Array of hotel ids to retrieve offers for.
                   in: query
                   items:
-                      type: string
+                    type: string
                   maxItems: 5
                   minItems: 1
                   name: hotelIds
@@ -2338,36 +2380,36 @@ paths:
                 - default: en
                   description: Language code that will be used for translation of strings for humans.
                   enum:
-                      - ar
-                      - da
-                      - de
-                      - en
-                      - es
-                      - fi
-                      - fr
-                      - he
-                      - hu
-                      - id
-                      - it
-                      - iw
-                      - ja
-                      - ko
-                      - ms
-                      - nb
-                      - nl
-                      - "no"
-                      - nn
-                      - pl
-                      - pt
-                      - pt-BR
-                      - ru
-                      - sv
-                      - th
-                      - tr
-                      - zh
-                      - zh-CN
-                      - zh-HK
-                      - zh-TW
+                    - ar
+                    - da
+                    - de
+                    - en
+                    - es
+                    - fi
+                    - fr
+                    - he
+                    - hu
+                    - id
+                    - it
+                    - iw
+                    - ja
+                    - ko
+                    - ms
+                    - nb
+                    - nl
+                    - "no"
+                    - nn
+                    - pl
+                    - pt
+                    - pt-BR
+                    - ru
+                    - sv
+                    - th
+                    - tr
+                    - zh
+                    - zh-CN
+                    - zh-HK
+                    - zh-TW
                   example: en
                   in: query
                   name: language
@@ -2375,9 +2417,9 @@ paths:
                 - default: desktop
                   description: The type of the requester's device. Derived from parsing User-Agent.
                   enum:
-                      - desktop
-                      - mobile
-                      - tablet
+                    - desktop
+                    - mobile
+                    - tablet
                   in: query
                   name: deviceType
                   type: string
@@ -2389,23 +2431,23 @@ paths:
                   type: string
                 - default: c3po6twr70
                   description: |-
-                      Identifier of origin of request. Mapping is configured in Offers
-                      Configuration Profile.
+                    Identifier of origin of request. Mapping is configured in Offers
+                    Configuration Profile.
                   enum:
-                      - c3po6twr70
-                      - r2d2m73kn8
-                      - ig88zpd1k7
-                      - bb8lf9nscr
+                    - c3po6twr70
+                    - r2d2m73kn8
+                    - ig88zpd1k7
+                    - bb8lf9nscr
                   in: query
                   name: originId
                   type: string
                 - description: |-
-                      Brand of an application that uses Sapi. Required to do RAA
-                      profile selection.
+                    Brand of an application that uses Sapi. Required to do RAA
+                    profile selection.
                   enum:
-                      - findhotel
-                      - etrip
-                      - vio
+                    - findhotel
+                    - etrip
+                    - vio
                   in: query
                   name: brand
                   type: string
@@ -2415,13 +2457,13 @@ paths:
                   name: rooms
                   type: string
                 - description: |-
-                      A correlation id used in Analytics to identify different
-                      searches.  Sapi SDK generates a new unique value per each new
-                      user search and passes it to Sapi Backend, the same value.  Value
-                      is changed when a new search initiated, check documentation for
-                      Sapi SDK for details what is considered a new search. Sapi
-                      Backend passes it to RAA when retrieving offers. If not provided,
-                      generated as UUID.
+                    A correlation id used in Analytics to identify different
+                    searches.  Sapi SDK generates a new unique value per each new
+                    user search and passes it to Sapi Backend, the same value.  Value
+                    is changed when a new search initiated, check documentation for
+                    Sapi SDK for details what is considered a new search. Sapi
+                    Backend passes it to RAA when retrieving offers. If not provided,
+                    generated as UUID.
                   in: query
                   name: searchId
                   type: string
@@ -2433,7 +2475,7 @@ paths:
                   example: sapi4eva-tags2-b,v8th43ad-saf-search-a
                   in: query
                   items:
-                      type: string
+                    type: string
                   name: variations
                   type: array
             produces:
@@ -2445,7 +2487,7 @@ paths:
                         $ref: '#/definitions/AvailabilityResponse'
             schemes:
                 - https
-            summary: /availability
+            summary: '# /availability'
     /offer/:id:
         get:
             consumes:
@@ -2462,12 +2504,12 @@ paths:
                 - application/json
             responses:
                 "200":
-                    description: Offer
+                    description: HotelOffer
                     schema:
-                        $ref: '#/definitions/Offer'
+                        $ref: '#/definitions/HotelOffer'
             schemes:
                 - https
-            summary: /offer/:id
+            summary: '# /offer/:id'
     /offers:
         get:
             consumes:
@@ -2480,8 +2522,8 @@ paths:
             operationId: offers
             parameters:
                 - description: |-
-                      Hotel ID of an anchor hotel,
-                      if provided then offers for the anchor hotel will be requested in a separate polling process from RAA, using different RAA profile.
+                    Hotel ID of an anchor hotel,
+                    if provided then offers for the anchor hotel will be requested in a separate polling process from RAA, using different RAA profile.
                   example: "123456"
                   in: query
                   name: anchorHotelId
@@ -2499,22 +2541,22 @@ paths:
                   name: checkOut
                   type: string
                 - description: |-
-                      UUID identifier of a request that client sends.
-                      Correlation id that Sapi passes to RAA for tracking purposes.
-                      If not provided, generated as UUID for every new polling, and polling iterations will reuse the same clientRequestId.
+                    UUID identifier of a request that client sends.
+                    Correlation id that Sapi passes to RAA for tracking purposes.
+                    If not provided, generated as UUID for every new polling, and polling iterations will reuse the same clientRequestId.
                   in: query
                   name: clientRequestId
                   type: string
                 - description: Codes of closed user group deals to retrieve from RAA.
                   enum:
-                      - signed_in
-                      - offline
-                      - sensitive
-                      - prime
-                      - backup
+                    - signed_in
+                    - offline
+                    - sensitive
+                    - prime
+                    - backup
                   in: query
                   items:
-                      type: string
+                    type: string
                   name: cugDeals
                   type: array
                 - description: User's access tier.
@@ -2536,7 +2578,7 @@ paths:
                 - description: Array of hotel ids to retrieve offers for.
                   in: query
                   items:
-                      type: string
+                    type: string
                   maxItems: 150
                   minItems: 1
                   name: hotelIds
@@ -2548,54 +2590,54 @@ paths:
                 - default: en
                   description: Language code that will be used for translation of strings for humans.
                   enum:
-                      - ar
-                      - da
-                      - de
-                      - en
-                      - es
-                      - fi
-                      - fr
-                      - he
-                      - hu
-                      - id
-                      - it
-                      - iw
-                      - ja
-                      - ko
-                      - ms
-                      - nb
-                      - nl
-                      - "no"
-                      - nn
-                      - pl
-                      - pt
-                      - pt-BR
-                      - ru
-                      - sv
-                      - th
-                      - tr
-                      - zh
-                      - zh-CN
-                      - zh-HK
-                      - zh-TW
+                    - ar
+                    - da
+                    - de
+                    - en
+                    - es
+                    - fi
+                    - fr
+                    - he
+                    - hu
+                    - id
+                    - it
+                    - iw
+                    - ja
+                    - ko
+                    - ms
+                    - nb
+                    - nl
+                    - "no"
+                    - nn
+                    - pl
+                    - pt
+                    - pt-BR
+                    - ru
+                    - sv
+                    - th
+                    - tr
+                    - zh
+                    - zh-CN
+                    - zh-HK
+                    - zh-TW
                   example: en
                   in: query
                   name: language
                   type: string
                 - default: desktop
                   description: |-
-                      The type of the requester's device. Derived from parsing User-Agent.
-                      Deprecated as of 2022-02-07, so clients can stop producing it - Sapi Backend would determine it from Visitor Context.
+                    The type of the requester's device. Derived from parsing User-Agent.
+                    Deprecated as of 2022-02-07, so clients can stop producing it - Sapi Backend would determine it from Visitor Context.
                   enum:
-                      - desktop
-                      - mobile
-                      - tablet
+                    - desktop
+                    - mobile
+                    - tablet
                   in: query
                   name: deviceType
                   type: string
                 - description: |-
-                      The 2-char ISO 3166 country code of a requester.
-                      Deprecated as of 2022-02-07, so clients can stop producing it - Sapi Backend would determine it from Visitor Context.
+                    The 2-char ISO 3166 country code of a requester.
+                    Deprecated as of 2022-02-07, so clients can stop producing it - Sapi Backend would determine it from Visitor Context.
                   in: query
                   maxLength: 2
                   minLength: 2
@@ -2603,23 +2645,23 @@ paths:
                   type: string
                 - default: c3po6twr70
                   description: |-
-                      TODO: rename to referrerId.
-                      See https://app.shortcut.com/findhotel/story/48084/
-                      
-                      Identifier of origin of request. Mapping is configured in Offers Configuration Profile.
+                    TODO: rename to referrerId.
+                    See https://app.shortcut.com/findhotel/story/48084/
+
+                    Identifier of origin of request. Mapping is configured in Offers Configuration Profile.
                   enum:
-                      - c3po6twr70
-                      - r2d2m73kn8
-                      - ig88zpd1k7
-                      - bb8lf9nscr
+                    - c3po6twr70
+                    - r2d2m73kn8
+                    - ig88zpd1k7
+                    - bb8lf9nscr
                   in: query
                   name: originId
                   type: string
                 - description: Brand of an application that uses Sapi. Required to do RAA profile selection.
                   enum:
-                      - findhotel
-                      - etrip
-                      - vio
+                    - findhotel
+                    - etrip
+                    - vio
                   in: query
                   name: brand
                   type: string
@@ -2634,21 +2676,21 @@ paths:
                   name: rooms
                   type: string
                 - description: |-
-                      A correlation id used in Analytics to identify different searches.
-                      Sapi SDK generates a new unique value per each new user search and passes it to Sapi Backend to both /search and /offers endpoints, the same value.
-                      Value is changed when a new search initiated, check documentation for Sapi SDK for details what is considered a new search.
-                      
-                      Sapi Backend passes it to RAA when retrieving offers.
-                      
-                      If not provided, generated as UUID.
-                      nolint:lll
+                    A correlation id used in Analytics to identify different searches.
+                    Sapi SDK generates a new unique value per each new user search and passes it to Sapi Backend to both /search and /offers endpoints, the same value.
+                    Value is changed when a new search initiated, check documentation for Sapi SDK for details what is considered a new search.
+
+                    Sapi Backend passes it to RAA when retrieving offers.
+
+                    If not provided, generated as UUID.
+                    nolint:lll
                   in: query
                   name: searchId
                   type: string
                 - description: |-
-                      Indicates to boost the OSO ranking of some offers, based on the criteria in the parameter.
-                      For example `freeCancellation=true:100` value will multiply the oso score by 100 for offers that have free cancellation.
-                      The boost is only supported for freeCancellation at the moment.
+                    Indicates to boost the OSO ranking of some offers, based on the criteria in the parameter.
+                    For example `freeCancellation=true:100` value will multiply the oso score by 100 for offers that have free cancellation.
+                    The boost is only supported for freeCancellation at the moment.
                   example: freeCancellation=true:100
                   in: query
                   name: sortingBoost
@@ -2661,14 +2703,14 @@ paths:
                   example: pp000004-tags2-b,v8th43ad-saf-search-a
                   in: query
                   items:
-                      type: string
+                    type: string
                   name: variations
                   type: array
                 - description: |-
-                      Metadata is an url encoded values contains additional information about the request.
-                      They will be sent to RAA as part of the url parameters in the request in the form of key=value.
-                      this value should contain a list of key/value pairs, for example we can use it to pass esd and epv values.
-                      so if we want to pass esd=xyz&epv=abc to RAA the value of metadata should be esd%3Dxyz%26epv%3Dabc
+                    Metadata is an url encoded values contains additional information about the request.
+                    They will be sent to RAA as part of the url parameters in the request in the form of key=value.
+                    this value should contain a list of key/value pairs, for example we can use it to pass esd and epv values.
+                    so if we want to pass esd=xyz&epv=abc to RAA the value of metadata should be esd%3Dxyz%26epv%3Dabc
                   example: metadata=esd%3Dxyz%26epv%3Dabc
                   in: query
                   name: metadata
@@ -2682,7 +2724,7 @@ paths:
                         $ref: '#/definitions/OffersResponse'
             schemes:
                 - https
-            summary: /offers
+            summary: '# /offers'
     /room:
         get:
             consumes:
@@ -2716,7 +2758,7 @@ paths:
                         $ref: '#/definitions/ErrorResponse'
             schemes:
                 - https
-            summary: /room
+            summary: '# /room'
     /rooms-offers:
         get:
             consumes:
@@ -2725,8 +2767,8 @@ paths:
             operationId: rooms-offers
             parameters:
                 - description: |-
-                      Amount of full days from now to desired check in date (works in
-                      combination with nights parameter).
+                    Amount of full days from now to desired check in date (works in
+                    combination with nights parameter).
                   example: 15
                   format: int64
                   in: query
@@ -2757,36 +2799,36 @@ paths:
                 - default: en
                   description: Language code that will be used for translation of strings for humans.
                   enum:
-                      - ar
-                      - da
-                      - de
-                      - en
-                      - es
-                      - fi
-                      - fr
-                      - he
-                      - hu
-                      - id
-                      - it
-                      - iw
-                      - ja
-                      - ko
-                      - ms
-                      - nb
-                      - nl
-                      - "no"
-                      - nn
-                      - pl
-                      - pt
-                      - pt-BR
-                      - ru
-                      - sv
-                      - th
-                      - tr
-                      - zh
-                      - zh-CN
-                      - zh-HK
-                      - zh-TW
+                    - ar
+                    - da
+                    - de
+                    - en
+                    - es
+                    - fi
+                    - fr
+                    - he
+                    - hu
+                    - id
+                    - it
+                    - iw
+                    - ja
+                    - ko
+                    - ms
+                    - nb
+                    - nl
+                    - "no"
+                    - nn
+                    - pl
+                    - pt
+                    - pt-BR
+                    - ru
+                    - sv
+                    - th
+                    - tr
+                    - zh
+                    - zh-CN
+                    - zh-HK
+                    - zh-TW
                   example: en
                   in: query
                   name: language
@@ -2827,15 +2869,15 @@ paths:
                   name: rooms
                   type: string
                 - description: |-
-                      The 2-char ISO 3166 country code of a requester.
-                      If not specified then the server determines it from the client's IP address.
+                    The 2-char ISO 3166 country code of a requester.
+                    If not specified then the server determines it from the client's IP address.
                   in: query
                   name: userCountry
                   type: string
                 - description: |-
-                      The type of the requester's device.
-                      If it isn't specified then the server determines it from User-Agent request header.
-                      If the server couldn't determine it, then value is set to desktop.
+                    The type of the requester's device.
+                    If it isn't specified then the server determines it from User-Agent request header.
+                    If the server couldn't determine it, then value is set to desktop.
                   in: query
                   name: deviceType
                   type: string
@@ -2845,11 +2887,11 @@ paths:
                   required: true
                   type: string
                 - description: |-
-                      comma-separated list of closed-user group deals, passed as is to RAA
-                      examples: cugDeals=offline,signed_in,sensitive
+                    comma-separated list of closed-user group deals, passed as is to RAA
+                    examples: cugDeals=offline,signed_in,sensitive
                   in: query
                   items:
-                      type: string
+                    type: string
                   name: cugDeals
                   type: array
                 - description: user access tier passed as is to RAA
@@ -2866,17 +2908,17 @@ paths:
                   name: squashing
                   type: string
                 - description: |-
-                      If 0 it disables the de-duplication feature. (it is enabled by default) deduplicateOffers returns unique offers.
-                      Input is array of offers for the same room. Returned offers are not sorted. Details at https://app.shortcut.com/findhotel/story/47743/
+                    If 0 it disables the de-duplication feature. (it is enabled by default) deduplicateOffers returns unique offers.
+                    Input is array of offers for the same room. Returned offers are not sorted. Details at https://app.shortcut.com/findhotel/story/47743/
                   in: query
                   name: deduplication
                   type: string
                 - description: |-
-                      If 0 it disables the withoutIrrelevant feature. (it is enabled by default) withoutIrrelevant takes offers within
-                      the same room and returns only such offers that have better conditions across dimensions.
-                      If the free cancellation offer is cheaper than or equal to non-refundable offer than just remove
-                      the non-refundable offer. This rule should be applied when there is no or equal services as well as
-                      same pay later options offered on both offers.
+                    If 0 it disables the withoutIrrelevant feature. (it is enabled by default) withoutIrrelevant takes offers within
+                    the same room and returns only such offers that have better conditions across dimensions.
+                    If the free cancellation offer is cheaper than or equal to non-refundable offer than just remove
+                    the non-refundable offer. This rule should be applied when there is no or equal services as well as
+                    same pay later options offered on both offers.
                   in: query
                   name: withoutIrrelevant
                   type: string
@@ -2892,7 +2934,7 @@ paths:
                   example: pp000004-tags2-b,v8th43ad-saf-search-a
                   in: query
                   items:
-                      type: string
+                    type: string
                   name: variations
                   type: array
                 - description: Whether we need to enable preheating feature or not
@@ -2925,7 +2967,7 @@ paths:
                         $ref: '#/definitions/RoomsResponse'
             schemes:
                 - https
-            summary: /rooms-offers
+            summary: '# /rooms-offers'
     /search:
         get:
             consumes:
@@ -2968,8 +3010,8 @@ paths:
             operationId: search
             parameters:
                 - description: |-
-                      Amount of full days from now to desired check in date (works in
-                      combination with nights parameter).
+                    Amount of full days from now to desired check in date (works in
+                    combination with nights parameter).
                   example: 15
                   format: int64
                   in: query
@@ -3009,20 +3051,20 @@ paths:
                   type: number
                 - $ref: '#/definitions/PrecisionRanges'
                   description: |-
-                      Precision holds ranges of precisions in the format of "from1-value1,from2-value2,from3-value3"
-                      where from is the distance in meters from the geolocation and value is the precision value in meters.
-                      For example, if the geolocation is 10 meters away from the object, the precision value will be 25 meters
-                      until the distance is 2000 meters.
-                      For the locations in 2000 meters away, the precision value will be 100 meters until the distance is 5000 meters.
-                      And so on.
+                    Precision holds ranges of precisions in the format of "from1-value1,from2-value2,from3-value3"
+                    where from is the distance in meters from the geolocation and value is the precision value in meters.
+                    For example, if the geolocation is 10 meters away from the object, the precision value will be 25 meters
+                    until the distance is 2000 meters.
+                    For the locations in 2000 meters away, the precision value will be 100 meters until the distance is 5000 meters.
+                    And so on.
                   in: query
                   name: precision
                 - description: |-
-                      topLeft and bottomRight coordinates of bounding box to perform search inside it.
-                      
-                      The format is `LatTopLeft,LonTopLeft,LatBottomRight,LonBottomRight`
-                      
-                      The types are all float64 numbers.
+                    topLeft and bottomRight coordinates of bounding box to perform search inside it.
+
+                    The format is `TopLeftLat,TopLeftLon,BottomRightLat,BottomRightLon`
+
+                    The types are all float64 numbers.
                   example: 46.650828100116044,7.123046875,45.17210966999772,1.009765625
                   format: coordinates
                   in: query
@@ -3052,9 +3094,9 @@ paths:
                   name: offset
                   type: integer
                 - description: |-
-                      Desired page size by the client. Use pagesize=0&hotelId=<id>
-                      to return anchor hotel only. Omitted pagesize (default) means the
-                      service decides the pagesize.
+                    Desired page size by the client. Use pagesize=0&hotelId=<id>
+                    to return anchor hotel only. Omitted pagesize (default) means the
+                    service decides the pagesize.
                   example: 0
                   format: int64
                   in: query
@@ -3070,36 +3112,36 @@ paths:
                 - default: en
                   description: Language code of a visitor
                   enum:
-                      - ar
-                      - da
-                      - de
-                      - en
-                      - es
-                      - fi
-                      - fr
-                      - he
-                      - hu
-                      - id
-                      - it
-                      - iw
-                      - ja
-                      - ko
-                      - ms
-                      - nb
-                      - nl
-                      - "no"
-                      - nn
-                      - pl
-                      - pt
-                      - pt-BR
-                      - ru
-                      - sv
-                      - th
-                      - tr
-                      - zh
-                      - zh-CN
-                      - zh-HK
-                      - zh-TW
+                    - ar
+                    - da
+                    - de
+                    - en
+                    - es
+                    - fi
+                    - fr
+                    - he
+                    - hu
+                    - id
+                    - it
+                    - iw
+                    - ja
+                    - ko
+                    - ms
+                    - nb
+                    - nl
+                    - "no"
+                    - nn
+                    - pl
+                    - pt
+                    - pt-BR
+                    - ru
+                    - sv
+                    - th
+                    - tr
+                    - zh
+                    - zh-CN
+                    - zh-HK
+                    - zh-TW
                   example: en
                   in: query
                   name: language
@@ -3113,27 +3155,27 @@ paths:
                   example: hotelEntities
                   in: query
                   items:
-                      type: string
+                    type: string
                   name: attributes
                   type: array
                 - default: popularity
                   description: Defines the sort by criteria
                   enum:
-                      - popularity
-                      - price
-                      - privateDeals
-                      - guestRating
+                    - popularity
+                    - price
+                    - privateDeals
+                    - guestRating
                   example: popularity
                   in: query
                   name: sortField
                   type: string
                 - default: ascending
                   description: |-
-                      Defines the sort order
-                      Note: If equals to ascending (default value),
-                      then MagicSort is not enabled and defined by the AB-test configuration or sapiOverride,
-                      if it equals to the name of configuration magic-sort-axis in AppConfig,
-                      then use provided configuration.
+                    Defines the sort order
+                    Note: If equals to ascending (default value),
+                    then MagicSort is not enabled and defined by the AB-test configuration or sapiOverride,
+                    if it equals to the name of configuration magic-sort-axis in AppConfig,
+                    then use provided configuration.
                   example: ascending
                   in: query
                   name: sortOrder
@@ -3141,22 +3183,22 @@ paths:
                 - description: Comma-separated chain ids whose hotels will be promoted in the hotel rankings above the rest hotels
                   in: query
                   items:
-                      type: string
+                    type: string
                   name: chainIds
                   type: array
                 - description: Facility ids used for facet filtering
                   in: query
                   items:
-                      format: int64
-                      type: integer
+                    format: int64
+                    type: integer
                   name: facilities
                   type: array
                 - description: For facet filtering by theme ids.
                   example: 4,5
                   in: query
                   items:
-                      format: int64
-                      type: integer
+                    format: int64
+                    type: integer
                   name: themeIds
                   type: array
                 - description: Lower bound for filter by guestRating.overall
@@ -3187,49 +3229,49 @@ paths:
                   name: priceMax
                   type: integer
                 - description: |-
-                      Filter by property type
-                      Beware that 0 is a valid property type.
+                    Filter by property type
+                    Beware that 0 is a valid property type.
                   example: 4,5
                   in: query
                   items:
-                      format: int64
-                      type: integer
+                    format: int64
+                    type: integer
                   name: propertyTypeId
                   type: array
                 - description: Negative filter by property type
                   example: 4,5
                   in: query
                   items:
-                      format: int64
-                      type: integer
+                    format: int64
+                    type: integer
                   name: notPropertyTypeId
                   type: array
                 - description: For facet filtering by star rating.
                   example: 4,5
                   in: query
                   items:
-                      format: int64
-                      type: integer
+                    format: int64
+                    type: integer
                   name: starRating
                   type: array
                 - description: |-
-                      UUID identifier of a request that client sends.
-                      Correlation id that Sapi passes to RAA for tracking purposes. If not provided, generated as UUID for every new polling, and polling iterations will reuse the same clientRequestId.
-                      nolint:lll
+                    UUID identifier of a request that client sends.
+                    Correlation id that Sapi passes to RAA for tracking purposes. If not provided, generated as UUID for every new polling, and polling iterations will reuse the same clientRequestId.
+                    nolint:lll
                   in: query
                   name: clientRequestId
                   type: string
                 - description: Codes of closed user group deals to retrieve offers
                   enum:
-                      - signed_in
-                      - offline
-                      - sensitive
-                      - prime
-                      - backup
+                    - signed_in
+                    - offline
+                    - sensitive
+                    - prime
+                    - backup
                   example: signed_in,offline
                   in: query
                   items:
-                      type: string
+                    type: string
                   name: cugDeals
                   type: array
                 - description: User's access tier.
@@ -3243,20 +3285,20 @@ paths:
                   type: string
                 - default: desktop
                   description: |-
-                      The type of the requester's device.
-                      If it isn't specified then the server determines it from User-Agent request header.
-                      If the server couldn't determine it, then value is set to desktop.
+                    The type of the requester's device.
+                    If it isn't specified then the server determines it from User-Agent request header.
+                    If the server couldn't determine it, then value is set to desktop.
                   enum:
-                      - desktop
-                      - mobile
-                      - tablet
+                    - desktop
+                    - mobile
+                    - tablet
                   example: desktop
                   in: query
                   name: deviceType
                   type: string
                 - description: |-
-                      The 2-char ISO 3166 country code of a requester.
-                      If not specified then the server determines it from the client's IP address.
+                    The 2-char ISO 3166 country code of a requester.
+                    If not specified then the server determines it from the client's IP address.
                   in: query
                   maxLength: 2
                   minLength: 2
@@ -3265,19 +3307,19 @@ paths:
                 - default: c3po6twr70
                   description: Identifier of origin where the request was originated
                   enum:
-                      - c3po6twr70
-                      - r2d2m73kn8
-                      - ig88zpd1k7
-                      - bb8lf9nscr
+                    - c3po6twr70
+                    - r2d2m73kn8
+                    - ig88zpd1k7
+                    - bb8lf9nscr
                   example: c3po6twr70
                   in: query
                   name: originId
                   type: string
                 - description: Brand of an application that uses Sapi. Required to do RAA profile selection
                   enum:
-                      - findhotel
-                      - etrip
-                      - vio
+                    - findhotel
+                    - etrip
+                    - vio
                   example: findhotel
                   in: query
                   name: brand
@@ -3295,21 +3337,21 @@ paths:
                   name: rooms
                   type: string
                 - description: |-
-                      A correlation id used in Analytics to identify different searches.
-                      Sapi SDK generates a new unique value per each new user search and passes it to Sapi Backend to both /search and /offers endpoints, the same value.
-                      Value is changed when a new search initiated, check documentation for Sapi SDK for details what is considered a new search.
-                      
-                      Sapi Backend passes it to RAA when retrieving offers.
-                      
-                      If not provided, generated as UUID.
-                      nolint:lll
+                    A correlation id used in Analytics to identify different searches.
+                    Sapi SDK generates a new unique value per each new user search and passes it to Sapi Backend to both /search and /offers endpoints, the same value.
+                    Value is changed when a new search initiated, check documentation for Sapi SDK for details what is considered a new search.
+
+                    Sapi Backend passes it to RAA when retrieving offers.
+
+                    If not provided, generated as UUID.
+                    nolint:lll
                   in: query
                   name: searchId
                   type: string
                 - description: |-
-                      Indicates to boost the OSO ranking of some offers, based on the criteria in the parameter.
-                      For example freeCancellation=true:100 value will multiply the oso score by 100 for offers that have free cancellation.
-                      The boost is only supported for freeCancellation at the moment.
+                    Indicates to boost the OSO ranking of some offers, based on the criteria in the parameter.
+                    For example freeCancellation=true:100 value will multiply the oso score by 100 for offers that have free cancellation.
+                    The boost is only supported for freeCancellation at the moment.
                   example: freeCancellation=true:100
                   in: query
                   name: sortingBoost
@@ -3346,7 +3388,7 @@ paths:
                         $ref: '#/definitions/SearchResponse'
             schemes:
                 - https
-            summary: /search
+            summary: '# /search'
         post:
             consumes:
                 - application/json
@@ -3358,7 +3400,7 @@ paths:
                 - in: body
                   name: sapiOverride
                   schema:
-                      type: string
+                    type: string
             produces:
                 - application/json
             responses:
@@ -3368,7 +3410,7 @@ paths:
                         $ref: '#/definitions/SearchResponse'
             schemes:
                 - https
-            summary: /search
+            summary: '# /search'
 produces:
     - application/json
 schemes:

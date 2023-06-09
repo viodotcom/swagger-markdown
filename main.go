@@ -138,7 +138,7 @@ func generateMarkdown(swagger *openapi3.T) string {
 				}
 			}
 
-			sb.WriteString("**Responses:**\n\n")
+			sb.WriteString("\n**Responses:**\n\n")
 			sb.WriteString("| Status Code | Description |\n")
 			sb.WriteString("| --- | --- |\n")
 

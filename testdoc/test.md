@@ -68,7 +68,7 @@ Returns information similar to /search but only for the anchor.
 | lat | false | number | Latitude in degrees | <nil> |
 | lon | false | number | Longitude in degrees | <nil> |
 |  | false | object |  | <nil> |
-| BoundingBox | false | string | topLeft and bottomRight coordinates of bounding box to perform search inside it.  The format is `LatTopLeft,LonTopLeft,LatBottomRight,LonBottomRight`  The types are all float64 numbers. | 46.650828100116044,7.123046875,45.17210966999772,1.009765625 |
+| BoundingBox | false | string | topLeft and bottomRight coordinates of bounding box to perform search inside it.  The format is `TopLeftLat,TopLeftLon,BottomRightLat,BottomRightLon`  The types are all float64 numbers. | 46.650828100116044,7.123046875,45.17210966999772,1.009765625 |
 | HotelID | false | string | Hotel ID for hotel search. If present, takes precedence over placeId, query and geolocation. | 1371626 |
 | PlaceID | false | string | Place ID for place search. If present, takes precedence over query and geolocation. | 47319 |
 | Query | false | string | Free-text query | Amsterdam city |
@@ -152,7 +152,7 @@ Returns an offer detail for the specific offer ID.
 
 | Status Code | Description |
 | --- | --- |
-| 200 | [Offer](#/definitions/Offer) |
+| 200 | [HotelOffer](#/definitions/HotelOffer) |
 
 
 ---
@@ -322,7 +322,7 @@ GET http://dikcjxfwieazv.cloudfront.net/search?offset=0&profileId=findhotel-webs
 | lat | false | number | Latitude in degrees | <nil> |
 | lon | false | number | Longitude in degrees | <nil> |
 |  | false | object |  | <nil> |
-| boundingBox | false | string | topLeft and bottomRight coordinates of bounding box to perform search inside it.  The format is `LatTopLeft,LonTopLeft,LatBottomRight,LonBottomRight`  The types are all float64 numbers. | 46.650828100116044,7.123046875,45.17210966999772,1.009765625 |
+| boundingBox | false | string | topLeft and bottomRight coordinates of bounding box to perform search inside it.  The format is `TopLeftLat,TopLeftLon,BottomRightLat,BottomRightLon`  The types are all float64 numbers. | 46.650828100116044,7.123046875,45.17210966999772,1.009765625 |
 | hotelId | false | string | Hotel ID for hotel search. If present, takes precedence over placeId, query and geolocation. | 1371626 |
 | placeId | false | string | Place ID for place search. If present, takes precedence over query and geolocation. | 47319 |
 | query | false | string | Free-text query | Amsterdam city |
@@ -406,7 +406,7 @@ anchor endpoint.
 | Name | Type | Description | Example |
 | --- | --- | --- | --- |
 | Attributes | []string | Comma-separated attributes to retrieve | hotelEntities |
-| BoundingBox | string | topLeft and bottomRight coordinates of bounding box to perform search inside it.  The format is `LatTopLeft,LonTopLeft,LatBottomRight,LonBottomRight`  The types are all float64 numbers. | 46.650828100116044,7.123046875,45.17210966999772,1.009765625 |
+| BoundingBox | string | topLeft and bottomRight coordinates of bounding box to perform search inside it.  The format is `TopLeftLat,TopLeftLon,BottomRightLat,BottomRightLon`  The types are all float64 numbers. | 46.650828100116044,7.123046875,45.17210966999772,1.009765625 |
 | Currency | string | 3-char ISO currency uppercase | EUR |
 | HotelID | string | Hotel ID for hotel search. If present, takes precedence over placeId, query and geolocation. | 1371626 |
 | Language | string ([enums](#/enums/Language)) | Language code of a visitor | en |
@@ -513,7 +513,7 @@ AnchorResponse is a response from /anchor handler.
 | --- | --- | --- | --- |
 | cheapestRate | [Rate](#/definitions/Rate) |  |  |
 | hotelID | string |  |  |
-| offers | [][Offer](#/definitions/Offer) |  |  |
+| offers | [][HotelOffer](#/definitions/HotelOffer) |  |  |
 | rooms | object |  |  |
 | searchParams | [SearchParams](#/definitions/SearchParams) |  |  |
 
@@ -564,8 +564,11 @@ AvailabilityResponse models response of GET /availability endpoint.
 
 <a id="/definitions/BoundingBox"></a>
 
-BoundingBox represents a "rectangle" between provided coordinates of
-top-left and bottom-right corners.
+BoundingBox represents a "rectangle".
+
+The rectangle is defined by two diagonally opposite points (hereafter TopLeft and BottomRight),
+hence by 4 floats: TopLeftLat, TopLeftLon, BottomRightLat, BottomRightLon.
+For example: BoundingBox = [ 47.3165, 4.9665, 47.3424, 5.0201 ]
 
 **Type:** object
 
@@ -573,10 +576,10 @@ top-left and bottom-right corners.
 
 | Name | Type | Description | Example |
 | --- | --- | --- | --- |
-| LatBottomRight | number |  |  |
-| LatTopLeft | number |  |  |
-| LonBottomRight | number |  |  |
-| LonTopLeft | number |  |  |
+| BottomRightLat | number |  |  |
+| BottomRightLon | number |  |  |
+| TopLeftLat | number |  |  |
+| TopLeftLon | number |  |  |
 
 
 
@@ -1128,6 +1131,36 @@ HotelEntities is a map of Hotel Entities with tags which are relevant to the req
 
 ---
 
+### <span id="/definitions/HotelOffer">HotelOffer</span>
+
+<a id="/definitions/HotelOffer"></a>
+
+**Type:** object
+
+**Properties:**
+
+| Name | Type | Description | Example |
+| --- | --- | --- | --- |
+| accessTier | string |  |  |
+| availableRooms | integer |  |  |
+| cancellationPenalties | [][CancellationPenalty](#/definitions/CancellationPenalty) |  |  |
+| currency | string |  |  |
+| id | string |  |  |
+| intermediaryProvider | string |  |  |
+| metadata | [Metadata](#/definitions/Metadata) |  |  |
+| occupancy | integer |  |  |
+| package | [Package](#/definitions/Package) |  |  |
+| providerCode | string |  |  |
+| rate | [Rate](#/definitions/Rate) |  |  |
+| roomID | string |  |  |
+| tags | []string |  |  |
+| url | string |  |  |
+
+
+
+
+---
+
 ### <span id="/definitions/HotelResponse">HotelResponse</span>
 
 <a id="/definitions/HotelResponse"></a>
@@ -1197,7 +1230,7 @@ HotelEntities is a map of Hotel Entities with tags which are relevant to the req
 | fetchedAllOffers | boolean | complete flag at the the hotel. |  |
 | hasMoreOffers | boolean | HasMoreOffers is true when there are more offers than topOfferLimit available. |  |
 | id | string |  |  |
-| offers | [][Offer](#/definitions/Offer) |  |  |
+| offers | [][HotelOffer](#/definitions/HotelOffer) |  |  |
 | rooms | object |  |  |
 
 
@@ -1351,49 +1384,6 @@ HotelEntities is a map of Hotel Entities with tags which are relevant to the req
 
 ---
 
-### <span id="/definitions/Offer">Offer</span>
-
-<a id="/definitions/Offer"></a>
-
-**Type:** object
-
-**Properties:**
-
-| Name | Type | Description | Example |
-| --- | --- | --- | --- |
-| availableRooms | integer | The number of similar rooms the provider still have available. |  |
-| canPayLater | boolean | Shows if the user can be charged later for the offer. |  |
-| cancellationPenalties | [][CancellationPenalty](#/definitions/CancellationPenalty) | The list of penalties applied to the cancellation of the offer. |  |
-| cug | []string | Access tier from Offers data model. Contains the minimum tier the user should be in order to access this offer. |  |
-| extraParams |  |  |  |
-| id | string | Offer ID from Offers data model. |  |
-| isClicked | boolean | True if the offer was matched with clicked offer from the search page |  |
-| links | [][RoomLink](#/definitions/RoomLink) | Array of one item containing a link to book the offer. |  |
-| matchType | string ([enums](#/enums/matchType)) | Type of clicked offer matching. 'exact' means price and all terms are matched. 'by_price' means price and some of terms (but not all) are matched. 'by_terms' means all terms are matched. Terms are freeCancellation, services, room name, payLater, offerType (public or private). |  |
-| matchedDim | [MatchedDim](#/definitions/MatchedDim) |  |  |
-| matchedOfferPriceDiff | number | In case of match, contains the absolute price diff in the same currency used to return the price. The diff is positive in case of the new price is higher and negative in case of the new price is lower. |  |
-| prices | [][RoomPrice](#/definitions/RoomPrice) | Array of prices containing user currency where chargeable are multiplied by number of rooms. |  |
-| providerCode | string | The code of the provider that is selling the offer. |  |
-| providerRateId | string |  |  |
-| providerRateType | string | The rateType in the providers terms. |  |
-| services | []unknown | List of services available for this offer. |  |
-| tags | []string |  |  |
-
-
-## Enums
-
-**<span id="/enums/matchType"></span>matchType:**
-
-| matchType |
-| --- |
-|exact, by_price, by_terms|
-
-
-
-
-
----
-
 ### <span id="/definitions/OfferRate">OfferRate</span>
 
 <a id="/definitions/OfferRate"></a>
@@ -1417,7 +1407,7 @@ HotelEntities is a map of Hotel Entities with tags which are relevant to the req
 
 <a id="/definitions/Offers"></a>
 
-[][Offer](#/definitions/Offer)
+[][RoomsOffer](#/definitions/RoomsOffer)
 
 
 
@@ -1429,7 +1419,7 @@ HotelEntities is a map of Hotel Entities with tags which are relevant to the req
 
 OffersMap is offers map data based on each HotelID retrieved from RAA
 
-**Type:** map[*]->[][Offer](#/definitions/Offer)
+**Type:** map[*]->[][HotelOffer](#/definitions/HotelOffer)
 
 
 
@@ -1518,7 +1508,7 @@ OffersMap is offers map data based on each HotelID retrieved from RAA
 
 | Name | Type | Description | Example |
 | --- | --- | --- | --- |
-| capacity | integer |  |  |
+| capacity | integer | capacity of the room |  |
 | language | string |  |  |
 | name | string |  |  |
 
@@ -1694,6 +1684,50 @@ OffersMap is offers map data based on each HotelID retrieved from RAA
 
 ---
 
+### <span id="/definitions/RoomsOffer">RoomsOffer</span>
+
+<a id="/definitions/RoomsOffer"></a>
+
+**Type:** object
+
+**Properties:**
+
+| Name | Type | Description | Example |
+| --- | --- | --- | --- |
+| availableRooms | integer | The number of similar rooms the provider still have available. |  |
+| canPayLater | boolean | Shows if the user can be charged later for the offer. |  |
+| cancellationPenalties | [][CancellationPenalty](#/definitions/CancellationPenalty) | The list of penalties applied to the cancellation of the offer. |  |
+| cug | []string | Access tier from Offers data model. Contains the minimum tier the user should be in order to access this offer. |  |
+| extraParams |  |  |  |
+| id | string | Offer ID from Offers data model. |  |
+| isClicked | boolean | True if the offer was matched with clicked offer from the search page |  |
+| links | [][RoomLink](#/definitions/RoomLink) | Array of one item containing a link to book the offer. |  |
+| matchType | string ([enums](#/enums/matchType)) | Type of clicked offer matching. 'exact' means price and all terms are matched. 'by_price' means price and some of terms (but not all) are matched. 'by_terms' means all terms are matched. Terms are freeCancellation, services, room name, payLater, offerType (public or private). |  |
+| matchedDim | [MatchedDim](#/definitions/MatchedDim) |  |  |
+| matchedOfferPriceDiff | number | In case of match, contains the absolute price diff in the same currency used to return the price. The diff is positive in case of the new price is higher and negative in case of the new price is lower. |  |
+| metadata | [Metadata](#/definitions/Metadata) |  |  |
+| prices | [][RoomPrice](#/definitions/RoomPrice) | Array of prices containing user currency where chargeable are multiplied by number of rooms. |  |
+| providerCode | string | The code of the provider that is selling the offer. |  |
+| providerRateId | string |  |  |
+| providerRateType | string | The rateType in the providers terms. |  |
+| services | []unknown | List of services available for this offer. |  |
+| tags | []string |  |  |
+
+
+## Enums
+
+**<span id="/enums/matchType"></span>matchType:**
+
+| matchType |
+| --- |
+|exact, by_price, by_terms|
+
+
+
+
+
+---
+
 ### <span id="/definitions/RoomsResponse">RoomsResponse</span>
 
 <a id="/definitions/RoomsResponse"></a>
@@ -1798,7 +1832,7 @@ search endpoint.
 | --- | --- | --- | --- |
 | anonymousId | string | Unique ID identifying users |  |
 | attributes | []string | Comma-separated attributes to retrieve | hotelEntities |
-| boundingBox | string | topLeft and bottomRight coordinates of bounding box to perform search inside it.  The format is `LatTopLeft,LonTopLeft,LatBottomRight,LonBottomRight`  The types are all float64 numbers. | 46.650828100116044,7.123046875,45.17210966999772,1.009765625 |
+| boundingBox | string | topLeft and bottomRight coordinates of bounding box to perform search inside it.  The format is `TopLeftLat,TopLeftLon,BottomRightLat,BottomRightLon`  The types are all float64 numbers. | 46.650828100116044,7.123046875,45.17210966999772,1.009765625 |
 | brand | string ([enums](#/enums/brand)) | Brand of an application that uses Sapi. Required to do RAA profile selection | findhotel |
 | chainIds | []string | Comma-separated chain ids whose hotels will be promoted in the hotel rankings above the rest hotels |  |
 | checkIn | string | Check in date (YYYY-MM-DD) | 2021-10-10 |
