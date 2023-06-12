@@ -81,9 +81,9 @@ func generateMarkdown(swagger *openapi3.T) string {
 	for _, path := range paths {
 		pathItem := swagger.Paths[path]
 		sb.WriteString("| [" + path + "](#path" + strings.ToLower(path) + ") | ")
-
-		methods := make([]string, 0, len(pathItem.Operations()))
-		for method := range pathItem.Operations() {
+		operations := pathItem.Operations()
+		methods := make([]string, 0, len(operations))
+		for method := range operations {
 			methods = append(methods, method)
 		}
 		sort.Strings(methods)
@@ -99,7 +99,14 @@ func generateMarkdown(swagger *openapi3.T) string {
 		sb.WriteString("## <span id=\"path" + path + "\">" + path + "</span>\n\n")
 
 		// Generate Markdown for each HTTP method in the path
-		for method, operation := range pathItem.Operations() {
+		operations := pathItem.Operations()
+		methods := make([]string, 0, len(operations))
+		for method := range operations {
+			methods = append(methods, method)
+		}
+		sort.Strings(methods)
+		for _, method := range methods {
+			operation := operations[method]
 			sb.WriteString("### " + method + "\n\n")
 			sb.WriteString(operation.Description + "\n\n")
 			sb.WriteString("**Parameters:**\n\n")
