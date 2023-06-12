@@ -42,6 +42,7 @@ https://app.shortcut.com/findhotel/story/66887/add-new-endpoint-to-sapi-to-expos
 | AnonymousID | false | string | (Optional) A cookie/browser-storage-based anonymous identifier of a user | <nil> |
 | UserID | false | string | (Optional) An authenticated user ID, e.g. the Google ID of a user | <nil> |
 | EmailDomain | false | string | (Optional) email domain for authenticated user as a value, if email is available. Users can't have access to CUG deals | <nil> |
+
 **Responses:**
 
 | Status Code | Description |
@@ -92,6 +93,7 @@ Returns information similar to /search but only for the anchor.
 | userId | false | string | User ID is an authenticated user ID, e.g. the Google ID of a user. It is used for constructing ACL context | <nil> |
 | emailDomain | false | string | User email domain is for authenticated user as a value, if email is available. | <nil> |
 | screenshots | false | integer | Screenshots is the number of screenshots detected by the client | <nil> |
+
 **Responses:**
 
 | Status Code | Description |
@@ -128,6 +130,7 @@ Returns availability details for hotels over specified period of check-in dates.
 | searchId | false | string | A correlation id used in Analytics to identify different searches.  Sapi SDK generates a new unique value per each new user search and passes it to Sapi Backend, the same value.  Value is changed when a new search initiated, check documentation for Sapi SDK for details what is considered a new search. Sapi Backend passes it to RAA when retrieving offers. If not provided, generated as UUID. | <nil> |
 | anonymousId | false | string | Unique ID identifying users. | <nil> |
 | variations | false | array | Comma-separated list of AB-testing variations to apply. | sapi4eva-tags2-b,v8th43ad-saf-search-a |
+
 **Responses:**
 
 | Status Code | Description |
@@ -148,6 +151,7 @@ Returns an offer detail for the specific offer ID.
 | Name | Required | Type | Description | Example |
 | --- | --- | --- | --- | --- |
 | id | true | string | offer ID | <nil> |
+
 **Responses:**
 
 | Status Code | Description |
@@ -192,6 +196,7 @@ An RAA client in Go had been implemented and exposed as a synchronous /offers HT
 | anonymousId | false | string | Unique ID identifying users. | <nil> |
 | variations | false | array | Comma-separated list of AB-testing variations to apply. | pp000004-tags2-b,v8th43ad-saf-search-a |
 | metadata | false | string | Metadata is an url encoded values contains additional information about the request. They will be sent to RAA as part of the url parameters in the request in the form of key=value. this value should contain a list of key/value pairs, for example we can use it to pass esd and epv values. so if we want to pass esd=xyz&epv=abc to RAA the value of metadata should be esd%3Dxyz%26epv%3Dabc | metadata=esd%3Dxyz%26epv%3Dabc |
+
 **Responses:**
 
 | Status Code | Description |
@@ -213,6 +218,7 @@ The endpoint returns room content for the given room id and providerCode.
 | --- | --- | --- | --- | --- |
 | id | true | string | Room ID | <nil> |
 | provider | false | string | Provider Code, uppercase. If provided, it reduces the chance of hash collisions | <nil> |
+
 **Responses:**
 
 | Status Code | Description |
@@ -263,6 +269,7 @@ Implements proxy to RAA’s /room endpoint enriched with Room Content.
 | emailDomain | false | string | User email domain is for authenticated user as a value, if email is available. | <nil> |
 | searchId | false | string | Unique identifier of the current search used for analytical purposes. | <nil> |
 | profileId | true | string | Profile is a set of configurations for a SAPI client | <nil> |
+
 **Responses:**
 
 | Status Code | Description |
@@ -362,6 +369,7 @@ GET http://dikcjxfwieazv.cloudfront.net/search?offset=0&profileId=findhotel-webs
 | userId | false | string | User ID is an authenticated user ID, e.g. the Google ID of a user. It is used for constructing ACL context. | <nil> |
 | emailDomain | false | string | User email domain is for authenticated user as a value, if email is available. | <nil> |
 | screenshots | false | integer | Screenshots is the number of screenshots detected by the client | <nil> |
+
 **Responses:**
 
 | Status Code | Description |
@@ -381,6 +389,7 @@ It works as GET /search endpoint but also accepts sapiOverride parameter in requ
 | Name | Required | Type | Description | Example |
 | --- | --- | --- | --- | --- |
 | sapiOverride | false |  |  | <nil> |
+
 **Responses:**
 
 | Status Code | Description |
