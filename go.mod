@@ -1,4 +1,4 @@
-module github.com/FindHotel/swagger-markdown
+module github.com/viodotcom/swagger-markdown
 
 go 1.20
 
