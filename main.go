@@ -24,7 +24,7 @@ func main() {
 	// check if the input file exists
 	if _, err := os.Stat(*input); os.IsNotExist(err) {
 		fmt.Printf("Input file not found: %s\n", *input)
-		return
+		panic(err)
 	}
 
 	// read the swagger file
@@ -37,7 +37,7 @@ func main() {
 	swagger, err := openapi3.NewLoader().LoadFromData(swaggerData)
 	if err != nil {
 		fmt.Printf("Error parsing Swagger file: %v\n", err)
-		return
+		panic(err)
 	}
 
 	// generate markdown
