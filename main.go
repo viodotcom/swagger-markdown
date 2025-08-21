@@ -28,7 +28,7 @@ func main() {
 		} else {
 			fmt.Printf("Error parsing Swagger file: %v\n", err)
 		}
-		return
+		os.Exit(1)
 	}
 
 	// Generate markdown
@@ -38,7 +38,7 @@ func main() {
 	err = os.WriteFile(*output, []byte(markdown), 0644)
 	if err != nil {
 		fmt.Printf("Error writing output file: %v\n", err)
-		return
+		os.Exit(1)
 	}
 
 	fmt.Printf("Markdown file generated: %s\n", *output)
