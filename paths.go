@@ -9,10 +9,18 @@ import (
 )
 
 // generatePathsTable generates a markdown table of all paths with links
+// Sample output:
+// ## Paths
+//
+// | Path                          | Operations       |
+// | ----------------------------- | ---------------- |
+// | [/users](#path/users)         | get, post        |
+// | [/users/{id}](#path/users/id) | get, put, delete |
 func generatePathsTable(paths openapi3.Paths) string {
 	var sb strings.Builder
 
-	sb.WriteString(pathsSection + newlineDouble)
+	sb.WriteString(pathsSection)
+	sb.WriteString(newlineDouble)
 	sb.WriteString(pathsTableHeader)
 
 	// Sort paths by path name
@@ -39,6 +47,14 @@ func generatePathsTable(paths openapi3.Paths) string {
 }
 
 // generatePathsDocumentation generates detailed markdown for each path and operation
+// Sample output:
+// ## <span id="path/users">/users</span>
+//
+// ### GET
+// Get all users
+//
+// **Parameters:**
+// ...
 func generatePathsDocumentation(paths openapi3.Paths) string {
 	var sb strings.Builder
 
@@ -61,7 +77,7 @@ func generatePathsDocumentation(paths openapi3.Paths) string {
 			methods = append(methods, method)
 		}
 		sort.Strings(methods)
-		
+
 		for _, method := range methods {
 			operation := operations[method]
 			sb.WriteString(generateOperationDocumentation(method, operation))
@@ -72,12 +88,27 @@ func generatePathsDocumentation(paths openapi3.Paths) string {
 }
 
 // generateOperationDocumentation generates markdown for a single operation
+// Sample output:
+// ### GET
+// Get user by ID
+//
+// **Parameters:**
+// | Name | Required | Type   | Description | Example |
+// | ---- | -------- | ------ | ----------- | ------- |
+// | id   | true     | string | User ID     | 123     |
+//
+// **Responses:**
+// | Status Code | Description                           |
+// | ----------- | ------------------------------------- |
+// | 200         | [Success response](#/definitions/User) |
 func generateOperationDocumentation(method string, operation *openapi3.Operation) string {
 	var sb strings.Builder
 
-	sb.WriteString("### " + method + "\n\n")
-	sb.WriteString(operation.Description + "\n\n")
-	
+	sb.WriteString("### " + method)
+	sb.WriteString(newlineDouble)
+	sb.WriteString(operation.Description)
+	sb.WriteString(newlineDouble)
+
 	sb.WriteString(generateParametersTable(operation.Parameters))
 	sb.WriteString(generateRequestBodyTable(operation.RequestBody))
 	sb.WriteString(generateResponsesTable(operation.Responses))
@@ -87,10 +118,18 @@ func generateOperationDocumentation(method string, operation *openapi3.Operation
 }
 
 // generateParametersTable generates a markdown table for operation parameters
+// Sample output:
+// **Parameters:**
+//
+// | Name  | Required | Type    | Description | Example |
+// | ----- | -------- | ------- | ----------- | ------- |
+// | id    | true     | string  | User ID     | 123     |
+// | limit | false    | integer | Max results | 10      |
 func generateParametersTable(parameters openapi3.Parameters) string {
 	var sb strings.Builder
 
-	sb.WriteString(parametersSection + newlineDouble)
+	sb.WriteString(parametersSection)
+	sb.WriteString(newlineDouble)
 	sb.WriteString(paramsTableHeader)
 
 	for _, parameter := range parameters {
@@ -114,6 +153,13 @@ func generateParametersTable(parameters openapi3.Parameters) string {
 }
 
 // generateRequestBodyTable generates a markdown table for request body
+// Sample output:
+//
+// **Request Body:**
+//
+// | Name | Required | Type   | Description | Example |
+// | ---- | -------- | ------ | ----------- | ------- |
+// | User | true     | object | User data   | {...}   |
 func generateRequestBodyTable(requestBody *openapi3.RequestBodyRef) string {
 	if requestBody == nil {
 		return ""
@@ -122,7 +168,8 @@ func generateRequestBodyTable(requestBody *openapi3.RequestBodyRef) string {
 	var sb strings.Builder
 
 	sb.WriteString(newlineDouble)
-	sb.WriteString(requestBodySection + newlineDouble)
+	sb.WriteString(requestBodySection)
+	sb.WriteString(newlineDouble)
 	sb.WriteString(paramsTableHeader)
 
 	for _, mediaType := range requestBody.Value.Content {
@@ -137,10 +184,20 @@ func generateRequestBodyTable(requestBody *openapi3.RequestBodyRef) string {
 }
 
 // generateResponsesTable generates a markdown table for responses
+// Sample output:
+//
+// **Responses:**
+//
+// | Status Code | Description                             |
+// | ----------- | --------------------------------------- |
+// | 200         | [Success response](#/definitions/User) |
+// | 404         | [User not found](#/definitions/Error)  |
 func generateResponsesTable(responses openapi3.Responses) string {
 	var sb strings.Builder
 
-	sb.WriteString(newline + responsesSection + newlineDouble)
+	sb.WriteString(newline)
+	sb.WriteString(responsesSection)
+	sb.WriteString(newlineDouble)
 	sb.WriteString(responsesTableHeader)
 
 	// Sort responses by status code

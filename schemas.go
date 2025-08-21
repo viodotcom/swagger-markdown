@@ -7,6 +7,16 @@ import (
 )
 
 // markDownDefinitions generates markdown for schema definitions
+// Sample output:
+// ### <span id="/definitions/User">User</span>
+//
+// <a id="/definitions/User"></a>
+//
+// User Object
+// Represents a user in the system
+//
+// **Type:** object
+// ...
 func markDownDefinitions(definitionsMap map[string]any) string {
 	var sb strings.Builder
 
@@ -28,18 +38,22 @@ func markDownDefinitions(definitionsMap map[string]any) string {
 		}
 
 		if title, ok := schemaMap["title"].(string); ok {
-			sb.WriteString(title + "\n\n")
+			sb.WriteString(title)
+			sb.WriteString(newlineDouble)
 		}
 
 		if description, ok := schemaMap["description"].(string); ok {
-			sb.WriteString(description + "\n\n")
+			sb.WriteString(description)
+			sb.WriteString(newlineDouble)
 		}
 
 		switch schemaMap["type"] {
 		case "object":
-			sb.WriteString(objectMarkDown(schemaMap) + "\n\n")
+			sb.WriteString(objectMarkDown(schemaMap))
+			sb.WriteString(newlineDouble)
 		case "array":
-			sb.WriteString(arrayMarkDown(schemaMap) + "\n\n")
+			sb.WriteString(arrayMarkDown(schemaMap))
+			sb.WriteString(newlineDouble)
 		default:
 			sb.WriteString(fmt.Sprintf("**Type:** %s\n\n", schemaMap["type"]))
 		}
@@ -51,6 +65,7 @@ func markDownDefinitions(definitionsMap map[string]any) string {
 }
 
 // detectObjectGoType determines if a schema represents an object or a map
+// Returns: "object", "map", or ""
 func detectObjectGoType(schemaMap map[string]any) string {
 	if _, ok := schemaMap["properties"]; ok {
 		return "object"
@@ -64,6 +79,15 @@ func detectObjectGoType(schemaMap map[string]any) string {
 }
 
 // objectMarkDown generates markdown for object schemas
+// Sample output:
+// **Type:** object
+//
+// **Properties:**
+//
+// | Name | Type   | Description | Example  |
+// | ---- | ------ | ----------- | -------- |
+// | id   | string | User ID     | 123      |
+// | name | string | User name   | John Doe |
 func objectMarkDown(schemaMap map[string]any) string {
 	goType := detectObjectGoType(schemaMap)
 
@@ -78,6 +102,14 @@ func objectMarkDown(schemaMap map[string]any) string {
 }
 
 // objectMD generates markdown for object types with properties
+// Sample output:
+// **Type:** object
+//
+// **Properties:**
+//
+// | Name | Type   | Description | Example |
+// | ---- | ------ | ----------- | ------- |
+// | id   | string | User ID     | 123     |
 func objectMD(schemaMap map[string]any) string {
 	properties, ok := schemaMap["properties"]
 	if !ok {
@@ -90,8 +122,10 @@ func objectMD(schemaMap map[string]any) string {
 	}
 
 	var sb strings.Builder
-	sb.WriteString(objectTypeLabel + newlineDouble)
-	sb.WriteString(propertiesSection + newlineDouble)
+	sb.WriteString(objectTypeLabel)
+	sb.WriteString(newlineDouble)
+	sb.WriteString(propertiesSection)
+	sb.WriteString(newlineDouble)
 	sb.WriteString(propsTableHeader)
 
 	enumInformations := make(map[string][]string)
@@ -147,8 +181,9 @@ func objectMD(schemaMap map[string]any) string {
 	}
 
 	if len(enumInformations) > 0 {
-		sb.WriteString("\n\n")
-		sb.WriteString(enumsSection + newlineDouble)
+		sb.WriteString(newlineDouble)
+		sb.WriteString(enumsSection)
+		sb.WriteString(newlineDouble)
 
 		// Sort enums by name
 		enumNames := make([]string, 0, len(enumInformations))
@@ -170,6 +205,8 @@ func objectMD(schemaMap map[string]any) string {
 }
 
 // mapMD generates markdown for map types
+// Sample output:
+// **Type:** map[*]->[User](#/definitions/User)
 func mapMD(schemaMap map[string]any) string {
 	sb := strings.Builder{}
 
@@ -200,6 +237,9 @@ func mapMD(schemaMap map[string]any) string {
 }
 
 // arrayMarkDown generates markdown for array types
+// Sample output:
+// [][User](#/definitions/User)
+// []string
 func arrayMarkDown(schemaMap map[string]any) string {
 	sb := strings.Builder{}
 	sb.WriteString("[]")

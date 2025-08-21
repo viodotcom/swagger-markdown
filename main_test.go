@@ -10,8 +10,8 @@ import (
 
 func TestGenerateMarkdownIntegration(t *testing.T) {
 	// Test with the existing YAML file
-	inputFile := "./testdoc/sapi-backend.yaml"
-	expectedOutputFile := "./testdata/baseline-before-constants.md"
+	inputFile := "./testdata/sample-swagger.yaml"
+	expectedOutputFile := "./testdata/sample-output.md"
 
 	// Read the input file
 	swaggerData, err := os.ReadFile(inputFile)
