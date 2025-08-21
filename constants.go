@@ -11,7 +11,6 @@ const (
 	paramsTableHeader    = "| Name | Required | Type | Description | Example |" + newline + "| --- | --- | --- | --- | --- |" + newline
 	responsesTableHeader = "| Status Code | Description |" + newline + "| --- | --- |" + newline
 	propsTableHeader     = "| Name | Type | Description | Example |" + newline + "| --- | --- | --- | --- |" + newline
-	enumTableHeader      = "| %s |" + newline + "| --- |" + newline
 
 	// Section headers (clean content without formatting)
 	pathsSection       = "## Paths"
