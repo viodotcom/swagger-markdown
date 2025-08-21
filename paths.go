@@ -54,6 +54,36 @@ func generatePathsTable(paths openapi3.Paths) string {
 // Get all users
 //
 // **Parameters:**
+// | Name  | Required | Type    | Description | Example |
+// | ----- | -------- | ------- | ----------- | ------- |
+// | limit | false    | integer | Max results | 10      |
+//
+// **Responses:**
+// | Status Code | Description                           |
+// | ----------- | ------------------------------------- |
+// | 200         | [Success response](#/definitions/User) |
+//
+// ---
+//
+// ### POST
+// Create new user
+//
+// **Request Body:**
+// | Name | Required | Type   | Description | Example |
+// | ---- | -------- | ------ | ----------- | ------- |
+// | User | true     | object | User data   | {...}   |
+//
+// **Responses:**
+// | Status Code | Description                           |
+// | ----------- | ------------------------------------- |
+// | 201         | [User created](#/definitions/User)   |
+//
+// ---
+//
+// ## <span id="path/users/{id}">/users/{id}</span>
+//
+// ### GET
+// Get user by ID
 // ...
 func generatePathsDocumentation(paths openapi3.Paths) string {
 	var sb strings.Builder
