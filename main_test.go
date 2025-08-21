@@ -276,3 +276,20 @@ func TestMapMD(t *testing.T) {
 		})
 	}
 }
+
+func TestInvalidInputFile(t *testing.T) {
+	// Test with invalid YAML file
+	inputFile := "./testdata/invalid.yaml"
+
+	// Read the input file
+	swaggerData, err := os.ReadFile(inputFile)
+	if err != nil {
+		t.Fatalf("Failed to read input file: %v", err)
+	}
+
+	// Parse the swagger file - should fail
+	_, err = openapi3.NewLoader().LoadFromData(swaggerData)
+	if err == nil {
+		t.Error("Expected error when parsing invalid YAML, but got none")
+	}
+}
