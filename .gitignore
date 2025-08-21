@@ -21,6 +21,9 @@ dist/
 go.work
 /testdoc/sapi-backend.md
 
+# Binary
+swagger-markdown
+
 # IDE directories
 .vscode/
 .idea/
