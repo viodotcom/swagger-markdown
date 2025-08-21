@@ -50,7 +50,7 @@ func TestGenerateMarkdownWithNilFields(t *testing.T) {
 			Title:       "Test API",
 			Description: "Test Description",
 		},
-		Paths: openapi3.Paths{},
+		Paths: openapi3.NewPaths(),
 	}
 
 	result := generateMarkdown(spec)
