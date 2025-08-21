@@ -1,0 +1,708 @@
+swagger: "2.0"
+info:
+  title: "Sample API Documentation"
+  description: "A comprehensive sample API demonstrating all OpenAPI features supported by the swagger-markdown generator"
+  version: "1.0.0"
+  contact:
+    name: "API Support"
+    email: "support@example.com"
+    url: "https://example.com/support"
+host: "api.example.com"
+basePath: "/v1"
+schemes:
+  - "https"
+  - "http"
+consumes:
+  - "application/json"
+  - "application/xml"
+produces:
+  - "application/json"
+  - "application/xml"
+
+paths:
+  /users:
+    get:
+      summary: "List all users"
+      description: "Retrieve a list of all users with optional filtering"
+      parameters:
+        - name: "page"
+          in: "query"
+          description: "Page number for pagination"
+          required: false
+          type: "integer"
+          minimum: 1
+          default: 1
+          example: 1
+        - name: "limit"
+          in: "query"
+          description: "Number of items per page"
+          required: false
+          type: "integer"
+          minimum: 1
+          maximum: 100
+          default: 20
+          example: 20
+        - name: "status"
+          in: "query"
+          description: "Filter users by status"
+          required: false
+          type: "string"
+          enum: ["active", "inactive", "pending"]
+          example: "active"
+        - name: "tags"
+          in: "query"
+          description: "Filter by tags (comma-separated)"
+          required: false
+          type: "array"
+          items:
+            type: "string"
+          example: ["premium", "verified"]
+      responses:
+        200:
+          description: "Successfully retrieved users"
+          schema:
+            $ref: "#/definitions/UserListResponse"
+        400:
+          description: "Invalid request parameters"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        500:
+          description: "Internal server error"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    post:
+      summary: "Create a new user"
+      description: "Create a new user account"
+      parameters:
+        - name: "user"
+          in: "body"
+          description: "User data"
+          required: true
+          schema:
+            $ref: "#/definitions/CreateUserRequest"
+      responses:
+        201:
+          description: "User created successfully"
+          schema:
+            $ref: "#/definitions/User"
+        400:
+          description: "Invalid user data"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        409:
+          description: "User already exists"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+  /users/{userId}:
+    get:
+      summary: "Get user by ID"
+      description: "Retrieve a specific user by their ID"
+      parameters:
+        - name: "userId"
+          in: "path"
+          description: "Unique identifier for the user"
+          required: true
+          type: "string"
+          format: "uuid"
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        - name: "include"
+          in: "query"
+          description: "Additional fields to include"
+          required: false
+          type: "array"
+          items:
+            type: "string"
+            enum: ["profile", "preferences", "statistics"]
+          example: ["profile", "preferences"]
+      responses:
+        200:
+          description: "User found"
+          schema:
+            $ref: "#/definitions/User"
+        404:
+          description: "User not found"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    put:
+      summary: "Update user"
+      description: "Update an existing user's information"
+      parameters:
+        - name: "userId"
+          in: "path"
+          description: "User ID"
+          required: true
+          type: "string"
+          format: "uuid"
+        - name: "user"
+          in: "body"
+          description: "Updated user data"
+          required: true
+          schema:
+            $ref: "#/definitions/UpdateUserRequest"
+      responses:
+        200:
+          description: "User updated successfully"
+          schema:
+            $ref: "#/definitions/User"
+        400:
+          description: "Invalid user data"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        404:
+          description: "User not found"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    delete:
+      summary: "Delete user"
+      description: "Delete a user account"
+      parameters:
+        - name: "userId"
+          in: "path"
+          description: "User ID"
+          required: true
+          type: "string"
+          format: "uuid"
+      responses:
+        204:
+          description: "User deleted successfully"
+        404:
+          description: "User not found"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+  /products:
+    get:
+      summary: "List products"
+      description: "Retrieve a list of products with advanced filtering"
+      parameters:
+        - name: "category"
+          in: "query"
+          description: "Product category"
+          required: false
+          type: "string"
+          example: "electronics"
+        - name: "price_min"
+          in: "query"
+          description: "Minimum price filter"
+          required: false
+          type: "number"
+          format: "float"
+          minimum: 0
+          example: 10.99
+        - name: "price_max"
+          in: "query"
+          description: "Maximum price filter"
+          required: false
+          type: "number"
+          format: "float"
+          minimum: 0
+          example: 999.99
+        - name: "in_stock"
+          in: "query"
+          description: "Filter by stock availability"
+          required: false
+          type: "boolean"
+          example: true
+      responses:
+        200:
+          description: "Products retrieved successfully"
+          schema:
+            $ref: "#/definitions/ProductListResponse"
+
+definitions:
+  User:
+    type: "object"
+    title: "User"
+    description: "A user in the system"
+    required:
+      - "id"
+      - "email"
+      - "username"
+      - "status"
+    properties:
+      id:
+        type: "string"
+        format: "uuid"
+        description: "Unique identifier for the user"
+        example: "123e4567-e89b-12d3-a456-426614174000"
+      email:
+        type: "string"
+        format: "email"
+        description: "User's email address"
+        example: "user@example.com"
+      username:
+        type: "string"
+        minLength: 3
+        maxLength: 50
+        description: "User's unique username"
+        example: "john_doe"
+      full_name:
+        type: "string"
+        description: "User's full name"
+        example: "John Doe"
+      age:
+        type: "integer"
+        minimum: 13
+        maximum: 120
+        description: "User's age"
+        example: 30
+      status:
+        type: "string"
+        enum: ["active", "inactive", "pending", "suspended"]
+        description: "Current status of the user account"
+        example: "active"
+      profile:
+        $ref: "#/definitions/UserProfile"
+      preferences:
+        $ref: "#/definitions/UserPreferences"
+      tags:
+        type: "array"
+        description: "User tags for categorization"
+        items:
+          type: "string"
+        example: ["premium", "verified", "beta_tester"]
+      metadata:
+        $ref: "#/definitions/StringMap"
+      created_at:
+        type: "string"
+        format: "date-time"
+        description: "When the user was created"
+        example: "2023-01-15T10:30:00Z"
+      updated_at:
+        type: "string"
+        format: "date-time"
+        description: "When the user was last updated"
+        example: "2023-01-20T15:45:00Z"
+
+  UserProfile:
+    type: "object"
+    title: "User Profile"
+    description: "Extended user profile information"
+    properties:
+      bio:
+        type: "string"
+        maxLength: 500
+        description: "User's biography"
+        example: "Software developer passionate about open source"
+      avatar_url:
+        type: "string"
+        format: "uri"
+        description: "URL to user's avatar image"
+        example: "https://example.com/avatars/user123.jpg"
+      location:
+        type: "string"
+        description: "User's location"
+        example: "San Francisco, CA"
+      website:
+        type: "string"
+        format: "uri"
+        description: "User's personal website"
+        example: "https://johndoe.com"
+      social_links:
+        $ref: "#/definitions/SocialLinks"
+      skills:
+        type: "array"
+        description: "User's skills"
+        items:
+          type: "string"
+        example: ["JavaScript", "Python", "Go"]
+
+  UserPreferences:
+    type: "object"
+    title: "User Preferences"
+    description: "User's application preferences and settings"
+    properties:
+      theme:
+        type: "string"
+        enum: ["light", "dark", "auto"]
+        description: "UI theme preference"
+        example: "dark"
+      language:
+        type: "string"
+        enum: ["en", "es", "fr", "de", "ja", "zh"]
+        description: "Preferred language"
+        example: "en"
+      timezone:
+        type: "string"
+        description: "User's timezone"
+        example: "America/New_York"
+      notifications:
+        $ref: "#/definitions/NotificationSettings"
+      privacy:
+        $ref: "#/definitions/PrivacySettings"
+
+  NotificationSettings:
+    type: "object"
+    title: "Notification Settings"
+    description: "User's notification preferences"
+    properties:
+      email_enabled:
+        type: "boolean"
+        description: "Enable email notifications"
+        example: true
+      push_enabled:
+        type: "boolean"
+        description: "Enable push notifications"
+        example: false
+      frequency:
+        type: "string"
+        enum: ["immediate", "daily", "weekly", "never"]
+        description: "Notification frequency"
+        example: "daily"
+      types:
+        type: "array"
+        description: "Types of notifications to receive"
+        items:
+          type: "string"
+          enum: ["updates", "marketing", "security", "social"]
+        example: ["updates", "security"]
+
+  PrivacySettings:
+    type: "object"
+    title: "Privacy Settings"
+    description: "User's privacy configuration"
+    properties:
+      profile_public:
+        type: "boolean"
+        description: "Make profile publicly visible"
+        example: true
+      show_email:
+        type: "boolean"
+        description: "Show email in public profile"
+        example: false
+      allow_indexing:
+        type: "boolean"
+        description: "Allow search engines to index profile"
+        example: true
+
+  SocialLinks:
+    type: "object"
+    title: "Social Links"
+    description: "Map of social platform names to URLs"
+    additionalProperties:
+      type: "string"
+      format: "uri"
+    example:
+      twitter: "https://twitter.com/johndoe"
+      linkedin: "https://linkedin.com/in/johndoe"
+      github: "https://github.com/johndoe"
+
+  StringMap:
+    type: "object"
+    title: "String Map"
+    description: "A map of string keys to string values"
+    additionalProperties:
+      type: "string"
+    example:
+      department: "Engineering"
+      team: "Backend"
+      role: "Senior Developer"
+
+  UserArrayMap:
+    type: "object"
+    title: "User Array Map"
+    description: "A map where values are arrays of users"
+    additionalProperties:
+      type: "array"
+      items:
+        $ref: "#/definitions/User"
+
+  NestedObjectMap:
+    type: "object"
+    title: "Nested Object Map"
+    description: "A map containing nested object structures"
+    additionalProperties:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+        value:
+          type: "string"
+        nested_array:
+          type: "array"
+          items:
+            type: "string"
+
+  CreateUserRequest:
+    type: "object"
+    title: "Create User Request"
+    description: "Request payload for creating a new user"
+    required:
+      - "email"
+      - "username"
+    properties:
+      email:
+        type: "string"
+        format: "email"
+        description: "User's email address"
+        example: "newuser@example.com"
+      username:
+        type: "string"
+        minLength: 3
+        maxLength: 50
+        description: "Desired username"
+        example: "new_user"
+      full_name:
+        type: "string"
+        description: "User's full name"
+        example: "New User"
+      password:
+        type: "string"
+        minLength: 8
+        format: "password"
+        description: "User's password"
+        example: "securePassword123"
+
+  UpdateUserRequest:
+    type: "object"
+    title: "Update User Request"
+    description: "Request payload for updating an existing user"
+    properties:
+      email:
+        type: "string"
+        format: "email"
+        description: "Updated email address"
+        example: "updated@example.com"
+      full_name:
+        type: "string"
+        description: "Updated full name"
+        example: "Updated Name"
+      status:
+        type: "string"
+        enum: ["active", "inactive", "pending", "suspended"]
+        description: "Updated user status"
+        example: "active"
+
+  UserListResponse:
+    type: "object"
+    title: "User List Response"
+    description: "Response containing a list of users with pagination"
+    properties:
+      users:
+        type: "array"
+        description: "Array of users"
+        items:
+          $ref: "#/definitions/User"
+      pagination:
+        $ref: "#/definitions/PaginationInfo"
+      total_count:
+        type: "integer"
+        description: "Total number of users"
+        example: 1500
+
+  Product:
+    type: "object"
+    title: "Product"
+    description: "A product in the catalog"
+    required:
+      - "id"
+      - "name"
+      - "price"
+    properties:
+      id:
+        type: "string"
+        description: "Product ID"
+        example: "prod-12345"
+      name:
+        type: "string"
+        description: "Product name"
+        example: "Wireless Headphones"
+      description:
+        type: "string"
+        description: "Product description"
+        example: "High-quality wireless headphones with noise cancellation"
+      price:
+        type: "number"
+        format: "float"
+        minimum: 0
+        description: "Product price"
+        example: 199.99
+      currency:
+        type: "string"
+        enum: ["USD", "EUR", "GBP", "JPY"]
+        description: "Price currency"
+        example: "USD"
+      category:
+        type: "string"
+        description: "Product category"
+        example: "electronics"
+      in_stock:
+        type: "boolean"
+        description: "Whether the product is in stock"
+        example: true
+      stock_quantity:
+        type: "integer"
+        minimum: 0
+        description: "Number of items in stock"
+        example: 50
+      variants:
+        type: "array"
+        description: "Product variants"
+        items:
+          $ref: "#/definitions/ProductVariant"
+      specifications:
+        $ref: "#/definitions/StringMap"
+
+  ProductVariant:
+    type: "object"
+    title: "Product Variant"
+    description: "A variant of a product"
+    properties:
+      id:
+        type: "string"
+        description: "Variant ID"
+        example: "var-001"
+      name:
+        type: "string"
+        description: "Variant name"
+        example: "Black - Large"
+      attributes:
+        type: "object"
+        description: "Variant attributes"
+        additionalProperties:
+          type: "string"
+        example:
+          color: "Black"
+          size: "Large"
+      price_adjustment:
+        type: "number"
+        format: "float"
+        description: "Price adjustment for this variant"
+        example: 0.00
+
+  ProductListResponse:
+    type: "object"
+    title: "Product List Response"
+    description: "Response containing a list of products"
+    properties:
+      products:
+        type: "array"
+        description: "Array of products"
+        items:
+          $ref: "#/definitions/Product"
+      filters_applied:
+        $ref: "#/definitions/StringMap"
+      total_count:
+        type: "integer"
+        description: "Total number of products matching filters"
+        example: 250
+
+  PaginationInfo:
+    type: "object"
+    title: "Pagination Info"
+    description: "Pagination metadata"
+    properties:
+      page:
+        type: "integer"
+        minimum: 1
+        description: "Current page number"
+        example: 1
+      limit:
+        type: "integer"
+        minimum: 1
+        description: "Items per page"
+        example: 20
+      total_pages:
+        type: "integer"
+        minimum: 1
+        description: "Total number of pages"
+        example: 75
+      has_next:
+        type: "boolean"
+        description: "Whether there is a next page"
+        example: true
+      has_previous:
+        type: "boolean"
+        description: "Whether there is a previous page"
+        example: false
+
+  ErrorResponse:
+    type: "object"
+    title: "Error Response"
+    description: "Standard error response format"
+    required:
+      - "error"
+      - "message"
+    properties:
+      error:
+        type: "string"
+        description: "Error code"
+        example: "INVALID_REQUEST"
+      message:
+        type: "string"
+        description: "Human-readable error message"
+        example: "The request parameters are invalid"
+      details:
+        type: "array"
+        description: "Detailed error information"
+        items:
+          type: "object"
+          properties:
+            field:
+              type: "string"
+              description: "Field that caused the error"
+              example: "email"
+            code:
+              type: "string"
+              description: "Specific error code for this field"
+              example: "INVALID_FORMAT"
+            message:
+              type: "string"
+              description: "Error message for this field"
+              example: "Email format is invalid"
+      timestamp:
+        type: "string"
+        format: "date-time"
+        description: "When the error occurred"
+        example: "2023-01-15T10:30:00Z"
+      request_id:
+        type: "string"
+        description: "Unique request identifier for debugging"
+        example: "req-abc123xyz"
+
+  ComplexNestedExample:
+    type: "object"
+    title: "Complex Nested Example"
+    description: "Demonstrates complex nested structures with arrays and maps"
+    properties:
+      multi_level_array:
+        type: "array"
+        description: "Array of arrays of strings"
+        items:
+          type: "array"
+          items:
+            type: "string"
+        example: [["tag1", "tag2"], ["tag3", "tag4"]]
+      object_array:
+        type: "array"
+        description: "Array of objects with nested properties"
+        items:
+          type: "object"
+          properties:
+            name:
+              type: "string"
+            nested_map:
+              type: "object"
+              additionalProperties:
+                type: "array"
+                items:
+                  type: "integer"
+      reference_array:
+        type: "array"
+        description: "Array of user references"
+        items:
+          $ref: "#/definitions/User"
+      mixed_type_map:
+        type: "object"
+        description: "Map with different value types"
+        additionalProperties:
+          type: "object"
+          properties:
+            type:
+              type: "string"
+              enum: ["string", "number", "boolean"]
+            value:
+              type: "string"
+            metadata:
+              $ref: "#/definitions/StringMap"
