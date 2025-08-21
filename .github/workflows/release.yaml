@@ -40,11 +40,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
-      - name: Install Tools
-        run: |
-          go install github.com/aktau/github-release@latest
-          go install github.com/goreleaser/nfpm/v2/cmd/nfpm@latest
-
       - name: Build release
         run: |
           set -x
