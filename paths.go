@@ -16,7 +16,7 @@ import (
 // | ----------------------------- | ---------------- |
 // | [/users](#path/users)         | get, post        |
 // | [/users/{id}](#path/users/id) | get, put, delete |
-func generatePathsTable(paths openapi3.Paths) string {
+func generatePathsTable(paths *openapi3.Paths) string {
 	var sb strings.Builder
 
 	sb.WriteString(pathsSection)
@@ -24,14 +24,15 @@ func generatePathsTable(paths openapi3.Paths) string {
 	sb.WriteString(pathsTableHeader)
 
 	// Sort paths by path name
-	pathNames := make([]string, 0, len(paths))
-	for path := range paths {
+	pathsMap := paths.Map()
+	pathNames := make([]string, 0, len(pathsMap))
+	for path := range pathsMap {
 		pathNames = append(pathNames, path)
 	}
 	sort.Strings(pathNames)
 
 	for _, path := range pathNames {
-		pathItem := paths[path]
+		pathItem := pathsMap[path]
 		sb.WriteString("| [" + path + "](" + pathPrefix + strings.ToLower(path) + ") | ")
 		operations := pathItem.Operations()
 		methods := make([]string, 0, len(operations))
@@ -85,19 +86,20 @@ func generatePathsTable(paths openapi3.Paths) string {
 // ### GET
 // Get user by ID
 // ...
-func generatePathsDocumentation(paths openapi3.Paths) string {
+func generatePathsDocumentation(paths *openapi3.Paths) string {
 	var sb strings.Builder
 
 	// Sort paths by path name
-	pathNames := make([]string, 0, len(paths))
-	for path := range paths {
+	pathsMap := paths.Map()
+	pathNames := make([]string, 0, len(pathsMap))
+	for path := range pathsMap {
 		pathNames = append(pathNames, path)
 	}
 	sort.Strings(pathNames)
 
 	// Generate Markdown for each path
 	for _, path := range pathNames {
-		pathItem := paths[path]
+		pathItem := pathsMap[path]
 		sb.WriteString("## <span id=\"path" + path + "\">" + path + "</span>\n\n")
 
 		// Generate Markdown for each HTTP method in the path
@@ -205,7 +207,11 @@ func generateRequestBodyTable(requestBody *openapi3.RequestBodyRef) string {
 	for _, mediaType := range requestBody.Value.Content {
 		sb.WriteString("| " + mediaType.Schema.Value.Title + " | ")
 		sb.WriteString(fmt.Sprintf("%v", mediaType.Schema.Value.Required) + " | ")
-		sb.WriteString(mediaType.Schema.Value.Type + " | ")
+		typeStr := ""
+		if mediaType.Schema.Value.Type != nil && len(*mediaType.Schema.Value.Type) > 0 {
+			typeStr = (*mediaType.Schema.Value.Type)[0]
+		}
+		sb.WriteString(typeStr + " | ")
 		sb.WriteString(oneleline(mediaType.Schema.Value.Description) + " | ")
 		sb.WriteString(fmt.Sprintf("%v", mediaType.Schema.Value.Example) + " |\n")
 	}
@@ -222,7 +228,7 @@ func generateRequestBodyTable(requestBody *openapi3.RequestBodyRef) string {
 // | ----------- | --------------------------------------- |
 // | 200         | [Success response](#/definitions/User) |
 // | 404         | [User not found](#/definitions/Error)  |
-func generateResponsesTable(responses openapi3.Responses) string {
+func generateResponsesTable(responses *openapi3.Responses) string {
 	var sb strings.Builder
 
 	sb.WriteString(newline)
@@ -231,14 +237,15 @@ func generateResponsesTable(responses openapi3.Responses) string {
 	sb.WriteString(responsesTableHeader)
 
 	// Sort responses by status code
-	statusCodes := make([]string, 0, len(responses))
-	for statusCode := range responses {
+	responsesMap := responses.Map()
+	statusCodes := make([]string, 0, len(responsesMap))
+	for statusCode := range responsesMap {
 		statusCodes = append(statusCodes, statusCode)
 	}
 	sort.Strings(statusCodes)
 
 	for _, statusCode := range statusCodes {
-		response := responses[statusCode]
+		response := responsesMap[statusCode]
 		description := ""
 
 		if response.Value.Description != nil {
