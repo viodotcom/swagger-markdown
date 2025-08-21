@@ -14,7 +14,7 @@ func main() {
 	input := flag.String("i", "", "input swagger file")
 	output := flag.String("o", "", "output markdown file")
 	flag.Parse()
-	
+
 	if *input == "" || *output == "" {
 		flag.Usage()
 		return

@@ -54,7 +54,7 @@ func TestGenerateMarkdownWithNilFields(t *testing.T) {
 	}
 
 	result := generateMarkdown(spec)
-	
+
 	expected := "# Test API\n\nTest Description\n\n## Paths\n\n| Path | Operations |\n| --- | --- |\n\n\n## Definitions\n\n"
 	if result != expected {
 		t.Errorf("Expected %q, got %q", expected, result)
@@ -77,12 +77,12 @@ func TestMarkDownDefinitions(t *testing.T) {
 	}
 
 	result := markDownDefinitions(definitions)
-	
+
 	// Should contain the schema name and basic structure
 	if len(result) == 0 {
 		t.Error("Expected non-empty result from markDownDefinitions")
 	}
-	
+
 	// Should contain schema title
 	if result == "" {
 		t.Error("Result should not be empty")

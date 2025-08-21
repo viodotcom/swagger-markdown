@@ -5,7 +5,7 @@ const (
 	// Basic formatting
 	newline       = "\n"
 	newlineDouble = "\n\n"
-	
+
 	// Table headers and separators (clean content + formatting)
 	pathsTableHeader     = "| Path | Operations |" + newline + "| --- | --- |" + newline
 	paramsTableHeader    = "| Name | Required | Type | Description | Example |" + newline + "| --- | --- | --- | --- | --- |" + newline
